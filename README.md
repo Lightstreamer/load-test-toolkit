@@ -1,19 +1,31 @@
-# load-test-toolkit
+<h1>Lightstreamer – Load Test Toolkit</h1>
+<h2>User's Guide</h2>
+<h5>The Lightstreamer Team <a href="mailto:support@lightstreamer.com">support@lightstreamer.com</a> 
+- Version 4.0, October 1, 2018</h5> 
 
-![](Pictures/10000000000003E80000010353B14188B39B694D.jpg)
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**
 
-Lightstreamer – Load Test Toolkit
+- [Introduction](#introduction)
+- [Architecture](#architecture)
+  - [Simple Case](#simple-case)
+  - [Scaling to more Client Simulators](#scaling-to-more-client-simulators)
+  - [Latency Reporting](#latency-reporting)
+  - [Overcoming TCP Port Limits](#overcoming-tcp-port-limits)
+- [Getting Started with the First Test](#getting-started-with-the-first-test)
+  - [Prepare the Two Machines](#prepare-the-two-machines)
+  - [Install the Software on Machine 1](#install-the-software-on-machine-1)
+  - [Install the Software on Machine 2](#install-the-software-on-machine-2)
+  - [Run the Test and Monitor the System](#run-the-test-and-monitor-the-system)
+- [General Tests and System Tuning](#general-tests-and-system-tuning)
+  - [Tuning the Software and the Operating System](#tuning-the-software-and-the-operating-system)
+  - [Activating Latency Reporting](#activating-latency-reporting)
+- [Scalability vs. Latency](#scalability-vs-latency)
 
-v. 4.0
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-User's Guide
-
-Last updated: 27/09/2018
-
-Table of
-contents
-
-# <span id="anchor"></span><span id="anchor-1"></span><span id="anchor-2"></span><span id="anchor-3"></span><span id="anchor-4"></span><span id="anchor-5"></span> <span id="anchor-6"></span><span id="anchor-7"></span>Introduction
+# Introduction
 
 The **Lightstreamer Load Test Toolkit** (**LLTT**) has been developed to
 help performing load tests on Lightstreamer Server. It complements,
@@ -34,7 +46,7 @@ Full Java source code for both the Adapter Simulator and the Client
 Simulator are provided in the LLTT package, to enable any required
 customization.
 
-# <span id="anchor-8"></span>The <span id="anchor-9"></span>Architecture
+# Architecture
 
 **Session**: a Lightstreamer session that simulates a user. Every
 session subscribes to one or more items and receives updates from
@@ -50,7 +62,7 @@ There are several possibilities when choosing how many Client Simulators
 to use and where to deploy them. In the sections below we will go
 through some of them.
 
-## <span id="anchor-10"></span>Simple Case
+## Simple Case
 
 In the simplest case, there are two machines involved in the test: one
 machine hosting a Client Simulator and one machine hosting the
@@ -59,13 +71,17 @@ this case, Client Simulator 1, running on Machine 2, will create K
 sessions. The value of K depends on the hardware characteristics of
 Machine 1 and the heaviness of the subscribed data.
 
-## <span id="anchor-11"></span>Scaling to more Client Simulators
+![Screenshot](img/simple-case.png)
+
+## Scaling to more Client Simulators
 
 If Machine 1 does not scale enough to simulate the required number of
 users, more machines can be added hosting more Client Simulators, as
 shown below.
 
-## <span id="anchor-12"></span>Latency Reporting
+![Screenshot](img/complex-case.png)
+
+## Latency Reporting
 
 The LLTT includes a facility to accurately measure and statistically
 analyze latencies for the pushed data.
@@ -93,6 +109,8 @@ M is usually a small number, to avoid stealing CPU cycles from the
 Lightstreamer Server, which is the subject under observation. If Client
 Simulator 4 is deployed on a dedicated machine, then M could be larger.
 
+![Screenshot](img/latency.png)
+
 **NOTE**: If testing a “broadcasting” scenario (that is, a few items
 subscribed to by all clients) the delays may not be randomly distributed
 among the clients; in other words, some clients may always receive
@@ -102,7 +120,7 @@ experience latencies constantly higher. This must be taken into account
 when analyzing the latency statistics and when determining a suitable
 value for M.
 
-## <span id="anchor-13"></span>Overcoming TCP Port Limits
+## Overcoming TCP Port Limits
 
 When you need to simulate very high numbers of users (hundreds of
 thousands or millions) and each machine dedicated to Client Simulators
@@ -122,30 +140,30 @@ may need to increase the default port range of the underlying operating
 system, as explained below.
 
   - **Linux**: 
-  - Find the current port range: *sysctl
-    net.ipv4.ip\_local\_port\_range*
-  - Set a new port range: *sudo sysctl -w
-    net.ipv4.ip\_local\_port\_range="1024 64000"*
-  - You may need to edit “/etc/sysctl.conf” file to make changes to
-    /proc filesystem permanently. For example, append the following to
-    your “/etc/sysctl.conf” file: *net.ipv4.ip\_local\_port\_range =
-    1024 65535*
+	  - Find the current port range: *sysctl
+	    net.ipv4.ip\_local\_port\_range*
+	  - Set a new port range: *sudo sysctl -w
+	    net.ipv4.ip\_local\_port\_range="1024 64000"*
+	  - You may need to edit “/etc/sysctl.conf” file to make changes to
+	    /proc filesystem permanently. For example, append the following to
+	    your “/etc/sysctl.conf” file: *net.ipv4.ip\_local\_port\_range =
+	    1024 65535*
 
 <!-- end list -->
 
   - **Windows**:
 
-  - Set the following registry key to
-    64000:  
-    *HKEY\_LOCAL\_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\MaxUserPort*
+	  - Set the following registry key to
+	    64000:  
+	    *HKEY\_LOCAL\_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters\\MaxUserPort*
     
-    On Linux, the limit on the open files also has to be set higher than
-    the expected number of connections.  
-    The launch script, “**start\_client.sh**”, tries to raise the “soft”
-    limit up to the “hard” limit granted to the user. Check if you have
-    to raise the user's “hard” limit as well.
+On Linux, the limit on the open files also has to be set higher than
+the expected number of connections.  
+The launch script, “**start\_client.sh**”, tries to raise the “soft”
+limit up to the “hard” limit granted to the user. Check if you have
+to raise the user's “hard” limit as well.
 
-# <span id="anchor-14"></span>Getting Started with the First Test
+# Getting Started with the First Test
 
 Let's set up the system for a simple test. As for the instructions
 below, we will refer to a simple deployment on two machines: **Machine
@@ -164,7 +182,7 @@ follows:
   - each update is made up of 5 fields
   - each field has a payload of 10 bytes
 
-## <span id="anchor-15"></span>Prepare the Two Machines
+## Prepare the Two Machines
 
 Make sure the latest version of the chosen **operating system **is being
 used, with all the patches and updates applied.
@@ -173,12 +191,10 @@ Install the latest available release of Java SE Development Kit on both
 the machines. If you need to use several gigabytes of memory, you need
 to install the 64-bit version of the JDK.
 
-## <span id="anchor-16"></span>Install the Software on Machine 1
+## Install the Software on Machine 1
 
 Install **Lightstreamer Server v. 6.1 (or newer)** on the Server
-machine, configure it following the
-
-GETTING\_STARTED.TXT instructions contained in the package, and verify
+machine, configure it following the GETTING\_STARTED.TXT instructions contained in the package, and verify
 that it works correctly, by running one of the preinstalled demos. 
 
 **NOTE**: If you use Lightstreamer 6.1.0, then you need
@@ -216,50 +232,55 @@ sure you have the following settings:
     flooding the Monitor Console channel with useless activity
     messages):
 
-\<appender name="LSProducer"
-class="com.lightstreamer.logback.ProducerAppender"\>  
-\<filter class="ch.qos.logback.classic.filter.ThresholdFilter"\>  
-\<level\>warn\</level\>  
-\</filter\>  
-\</appender\>  
+	```
+	<appender name="LSProducer" class="com.lightstreamer.logback.ProducerAppender">  
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">  
+			<level>warn</level>  
+		</filter>  
+	</appender>  
+	```
 
   - The “**LSConsole**” appender should be changed as follows (to avoid
     flooding the Console shell with useless activity messages):
 
-\<appender name="LSConsole"
-class="ch.qos.logback.core.ConsoleAppender"\>  
-\<filter class="ch.qos.logback.classic.filter.ThresholdFilter"\>  
-\<level\>warn\</level\>  
-\</filter\>  
-\<encoder\>  
-\<pattern\>%d{"dd.MMM.yy HH:mm:ss,SSS"} \&lt;%5.5(%p%marker)\&gt;
-%m%n\</pattern\>  
-\</encoder\>  
-\</appender\>  
+	```
+	<appender name="LSConsole" class="ch.qos.logback.core.ConsoleAppender">  
+		<filter class="ch.qos.logback.classic.filter.ThresholdFilter">  
+			<level>warn</level>  
+		</filter>  
+		<encoder>  
+			<pattern>%d{"dd.MMM.yy HH:mm:ss,SSS"} &lt;%5.5(%p%marker)&gt; %m%n</pattern>  
+		</encoder>  
+	</appender>  
+	```
 
   - The “**LightstreamerMonitorText**” and “**LightstreamerMonitorTAB**”
     categories should be changed as follows (to log the monitoring info
     more often and disable the tabular version of the same):
 
-\<logger name="LightstreamerMonitorText" level=”TRACE"\>  
-\<appender-ref ref="LSDailyRolling" /\>  
-\</logger\>
+	```
+	<logger name="LightstreamerMonitorText" level="TRACE">  
+		<appender-ref ref="LSDailyRolling" />  
+	</logger>
 
-\<logger name="LightstreamerMonitorTAB" level=”ERROR”\>  
-\<appender-ref ref="LSDailyRolling" /\>  
-\</logger\>
+	<logger name="LightstreamerMonitorTAB" level="ERROR">  
+		<appender-ref ref="LSDailyRolling" />  
+	</logger>
+	```
 
   - The “**LightstreamerLogger.pump**” category should be changed as
     follows (to avoid flooding the log with possible loops of
     notifications of lost updates):
 
-\<logger name="LightstreamerLogger.pump" level=”WARN" /\>  
+	```
+	<logger name="LightstreamerLogger.pump" level="WARN" />
+	```  
 
 Install the **Adapter Simulator**: open the “adapters” folder of the
 Lightstreamer Server installation and copy the “AdapterSimulator” folder
 from the LLTT inside it.
 
-## <span id="anchor-17"></span>Install the Software on Machine 2
+## Install the Software on Machine 2
 
 To install the **Client Simulator**, copy the “ClientSimulator” folder
 from the LLTT to Machine 2.
@@ -271,7 +292,7 @@ location of the JVM to use.
 Edit the **configuration.xml** file and specify the address of Machine 1
 as the “host” parameter.
 
-## <span id="anchor-18"></span>Run the Test and Monitor the System
+## Run the Test and Monitor the System
 
 The default configuration of the Adapter Simulator and the Client
 Simulator is as follows:
@@ -306,7 +327,7 @@ recommended:
     ***ifconfig*** and ***netstat –statistics*** commands (on Linux
     machines). Look for lost and retransmitted packets.
 
-# <span id="anchor-19"></span>General Tests and System Tuning
+# General Tests and System Tuning
 
 You can configure the LLTT to reflect a broad range of simulation
 scenarios. You may increase the total number of items, change the update
@@ -314,9 +335,9 @@ frequency, change the update size, change the number of items subscribed
 to by each session, run the test with TLS, enforce http streaming
 instead of WebSocket, etc.
 
-Refer to the inline comments within **adapters.xml** (for Adapter
+_Refer to the inline comments within **adapters.xml** (for Adapter
 Simulator) and **configuration.xml** (for Client Simulator) to know the
-meaning of the available parameters.
+meaning of the available parameters._
 
 Both the Client Simulator and the Adapter Simulator contain their own
 log4j configuration file, which can be edited: log\_conf.xml for the
@@ -346,7 +367,7 @@ Lightstreamer Server during the actual test. The
 this purpose (you may need to edit
 them).
 
-## <span id="anchor-20"></span>Tuning the Software and the Operating System
+## Tuning the Software and the Operating System
 
 Edit **LS.sh** (under the “bin/unix-like” folder) or **LS.bat** (under
 the “bin\\windows” folder) as follows:
@@ -404,7 +425,7 @@ through the *net.ip\_conntrack\_max* setting. In fact, we observed such
 a limit to be set with a default of about 260000 connections when
 deploying the Server through a docker.
 
-## <span id="anchor-21"></span>Activating Latency Reporting
+## Activating Latency Reporting
 
 To turn on latency reporting on a Client Simulator instance, you need to
 
@@ -412,11 +433,11 @@ To turn on latency reporting on a Client Simulator instance, you need to
     **adapters.xml** file of Lightstreamer Server.
   - Set priority value to **INFO** for the
     "**com.lightstreamer.load\_test.reports.latency\_reporting**"
-    category in the **log\_conf.xml **file of the Client Simulator,
+    category in the **log\_conf.xml** file of the Client Simulator,
     before launching the
 client.
 
-# <span id="anchor-22"></span><span id="anchor-23"></span>Scalability vs. Latency
+# Scalability vs. Latency
 
 Load testing is a complex discipline, as many variables usually tend to
 affect the results. Once some variables have been fixed, others can be
@@ -453,21 +474,20 @@ The main parameters affecting that trade-off are the following:
     the application) should be chosen (again, as part of a trade-off
     with scalability).
 
-  
-Tuning the garbage collection requires specific skills, because several
-collection algorithms with different specific parameters are provide by
-Oracle/Sun’s JVM. Please look for the Garbage Collection Tuning Guide
-for your Java installation for an overview of the available algorithms.
+  	Tuning the garbage collection requires specific skills, because several
+	collection algorithms with different specific parameters are provide by
+	Oracle/Sun’s JVM. Please look for the Garbage Collection Tuning Guide
+	for your Java installation for an overview of the available algorithms.
 
-If you experience bad performance, try this GC configuration. Edit
-LS.sh, go to JAVA\_OPTS, and use the following string in place of the
-default one: "*-server -XX:NewRatio=1 -XX:SurvivorRatio=4 -Xms256M
--Xmx4G*" (this will reduce the occurrence of major garbage collections
-in favor of minor ones). In case of a test with TLS, the heap limit may
-need to be higher.
+	If you experience bad performance, try this GC configuration. Edit
+	LS.s, go to JAVA\_OPTS, and use the following string in place of the
+	default one: "*-server -XX:NewRatio=1 -XX:SurvivorRatio=4 -Xms256M
+	-Xmx4G*" (this will reduce the occurrence of major garbage collections
+	in favor of minor ones). In case of a test with TLS, the heap limit may
+	need to be higher.
 
   
-For scenarios where a true pauseless garbage collection is required (to
-minimize latencies without reducing scalability) specific Java platforms
-exist. For example, see Azul Systems
-([www.azulsystems.com](http://www.azulsystems.com/)).
+	For scenarios where a true pauseless garbage collection is required (to
+	minimize latencies without reducing scalability) specific Java platforms
+	exist. For example, see Azul Systems
+	([www.azulsystems.com](http://www.azulsystems.com/)).
