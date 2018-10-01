@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+
+<client_conf>
+
+    <!-- Protocol, host and port for the Lightstreamer Server connections.
+         Supported values for the protocol are "ws://", "wss://", "http://" and "https://".
+         Note that the client is optimized for ws or http, whereas, for wss and https,
+         the memory and processing power requirements may be significant and
+         their usage is not fully optimized.
+         
+         Further notes for TLS/SSL tests:
+         - In order to run thousands of sessions with a single client process,
+           a huge amount of memory may be required; hence, check the supplied
+           launch scripts to ensure that any limits on the maximum heap size
+           granted to the JVM have been removed.
+         - If the client is configured to report latency statistics, the main
+           optimizations will be lost and; this should be affordable as long as few
+           sessions are configured for such a client.
+         - The use of a self-signed TLS/SSL certificate on the Server is supported,
+           provided that the certificate is added to the client's set of trusted
+           certificates; this can be done by setting the javax.net.ssl.trustStore
+           and javax.net.ssl.trustStorePassword JVM properties, as described in
+           the Java documentation. -->
+    <param name="protocol">ws://</param>
+    <param name="host">localhost</param>
+    <param name="port">80</param>
+    
+    <!-- This is the adapter set name of the Adapter Simulator. -->
+    <param name="adapterSetName">LOAD_TESTS</param>
+    <!--  <param name="dataAdapterName">DEFAULT</param> -->
+
+    <!-- Number of sessions launched by a single Client Simulator. -->
+    <param name="numberOfSessions">100</param>
+    
+    <!-- Number of items subscribed to by each session. -->
+    <param name="itemsPerSession">5</param>
+    
+     <!-- If true, the items subscribed to by each session are chosen randomly;
+          it is possible that the same item is subscribed more than once by
+          the same session.
+          If false, the available items are distributed among the various
+          sessions; different Client process instances would assign the items
+          to the sessions in the same way. -->
+     <param name="itemRandomExtraction">false</param>
+     
+     <!-- Optional range, out of the global set of items available, to be used
+          for the subscriptions. It must be ensured that:
+          1 <= firstItemAvailable <= lastItemAvailable <= numberOfItemsAvailable
+          (see also adapters.xml configuration file)
+          Specifying a range allows different Client Simulator processes to subscribe
+          to different items in their sessions. This can only be useful when
+          a single Client Simulator process cannot subscribe to all the available items
+          for performance or system limitations. However, this forces the configuration
+          files for the different Client Simulator processes to be different. -->
+     <!--
+     <param name="firstItemAvailable">101</param>
+     <param name="lastItemAvailable">200</param>
+     -->
+     
+     <!-- Duration of a session, in seconds, after the subscription has been issued. -->
+     <param name="sessionDurationSeconds">7200</param>
+     
+     <!-- Delay time, in milliseconds, between the beginning of two sessions in a Client. -->
+     <param name="delaySessionStartMillis">1</param>
+     
+     <!-- Number of threads allocated to Netty for IO operations. -->
+     <!-- param name="nettyThreads">8</param-->
+
+	 <!-- 	Minimum number of different sockets to be used for the create_session requests.
+            If there is a Load Balancer, a high number helps ensuring that the sessions
+            are evenly distributed among the available Server instances, since requests
+            coming from the same socket are expected to be assigned to the same instance. -->
+     <param name="minCreatePool">1</param>
+
+	 <!--  	Number of ports on which each server instance is listening to.
+	 		For example if this number is 3 and the base port (see above) is 80, the ports are 80, 81 and 82. -->
+     <param name="serverPorts">1</param>
+ 
+     <!-- Number of threads allocated to fire user listeners. -->
+     <param name="listenerThreads">1</param>
+     
+     <!-- When the flag is true and the protocol is HTTPS, the simulator tries to optimize the reading
+          by not decoding encrypted data. Default is true.
+          The trick only works if the simulator is instructed to make only one subscription,
+          which is its basic behavior, though. On the other hand, if manually customizing
+          the simulator and extending the behavior, then setting the flag to false may be needed.
+          Moreover, when "ignoreData" is false, the setting is superseded as false. -->
+     <!--
+     <param name="speedUpReading">false</param>
+     -->
+     
+     <!-- When the flag is set to true, the clients ignore the data coming from the streaming connections
+          (reducing the resource consumption of the toolkit). Default is true.
+          The trick only works if the simulator doesn't need to receive the callbacks upon incoming updates,
+          which is its basic behavior, though. On the other hand, if manually customizing
+          the simulator and extending the behavior, then setting the flag to false may be needed.
+          The server data cannot be ignored also when setting
+          the logger "com.lightstreamer.load_test.reports.session_events" at debug level (or finer)
+          or setting the logger "com.lightstreamer.load_test.reports.latency_reporting" at info level (or finer).
+          In those cases the setting is superseded as false. -->
+     <!--
+     <param name="ignoreData">false</param>
+     -->
+    
+</client_conf>

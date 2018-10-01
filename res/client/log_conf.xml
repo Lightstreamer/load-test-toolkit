@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+    
+    <appender name="Console" class="org.apache.log4j.ConsoleAppender">
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{dd-MM-yy HH:mm:ss,SSS}|%5.5p|%m%n"/>
+        </layout>
+    </appender>
+    
+    <appender name="DailyRolling" class="org.apache.log4j.DailyRollingFileAppender">
+        <param name="File" value="logs/Client.log"/>
+        <param name="DatePattern" value="'.'yyyy-MM-dd"/>
+        <layout class="org.apache.log4j.PatternLayout">
+            <param name="ConversionPattern" value="%d{dd-MMM-yy HH:mm:ss,SSS }|%-5.5p|%-33.33c|%-27.27t|%m%n"/>
+        </layout>
+    </appender>
+
+    <!-- At INFO level logs once per minute statistics regarding the registered latencies of
+         the data received from the Lightstreamer server. NOTE: This can be very heavy. 
+         Setting INFO or a lower level requires that the "injectTimestamps" parameter
+         on the Adapter Simulator configuration is set to "true".
+         If on startup this category is not configured to log INFO events, then changing
+         it to INFO at runtime has no effect.  -->
+    <category name="com.lightstreamer.load_test.reports.latency_reporting" class="org.apache.log4j.Logger">
+        <priority value="WARN"/>
+        <appender-ref ref="DailyRolling"/>
+        <appender-ref ref="Console"/>
+    </category>
+
+    <!-- Logs session related events.
+         At TRACE level it logs all the events received by the client. NOTE: This can be very heavy.
+         If on startup this category is configured not to log TRACE events, then changing it to TRACE at runtime has no effect.  -->
+    <category name="com.lightstreamer.load_test.reports.session_events" class="org.apache.log4j.Logger">
+        <priority value="INFO"/>
+        <appender-ref ref="DailyRolling"/>
+        <appender-ref ref="Console"/>
+    </category>
+    
+    <!-- Logs sample delays.
+         At DEBUG level it logs sample delays related with some of the updates received, chosen at random (about 10 per second).
+         The log is active only if the latency reporting is active (see com.lightstreamer.load_test.reports.latency_reporting).
+         If on startup this category is configured not to log DEBUG events, then changing it to DEBUG at runtime has no effect.  -->
+    <category name="com.lightstreamer.load_test.reports.timestamps" class="org.apache.log4j.Logger">
+        <priority value="DEBUG"/>
+        <appender-ref ref="DailyRolling"/>
+        <appender-ref ref="Console"/>
+    </category>
+
+    <!-- Logs details on the initialization phase. -->
+    <category name="com.lightstreamer.load_test.configuration" class="org.apache.log4j.Logger">
+        <priority value="DEBUG"/>
+        <appender-ref ref="DailyRolling"/>
+        <appender-ref ref="Console"/>
+    </category>
+    
+    <!-- Logs LightstreamerClient -->
+    <category name="com.lightstreamer.oneway_client" class="org.apache.log4j.Logger">
+        <priority value="INFO"/>
+        <appender-ref ref="DailyRolling"/>
+        <appender-ref ref="Console"/>
+    </category>
+    
+    <!-- Logs Netty -->
+    <category name="io.netty" class="org.apache.log4j.Logger">
+    	<priority value="WARN"/>
+    	<appender-ref ref="DailyRolling"/>
+        <appender-ref ref="Console"/>
+    </category>
+
+</log4j:configuration>
