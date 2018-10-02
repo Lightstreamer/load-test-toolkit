@@ -405,8 +405,6 @@ net.ipv4.tcp\_rmem = 4096 87380 33554432
 
 net.ipv4.tcp\_wmem = 4096 65536 33554432
 
-net.ipv4.tcp\_syncookies = 1
-
 net.ipv4.tcp\_mem = 786432 1048576 26777216
 
 net.ipv4.tcp\_max\_tw\_buckets = 360000
@@ -416,8 +414,6 @@ net.core.netdev\_max\_backlog = 2500
 net.ipv4.netfilter.ip\_conntrack\_max = 1048576
 
 vm.min\_free\_kbytes = 65536
-
-vm.swappiness = 0
 
 net.ipv4.ip\_local\_port\_range = 1024 65535
 
