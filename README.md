@@ -46,9 +46,15 @@ targeting the real Adapters and simulating the real Clients.
 This user's guide describes the architecture of the LLTT and provides
 the instructions on how to configure, deploy, and run it.
 
-Full Java source code for both the Adapter Simulator and the Client
-Simulator are provided in the LLTT package, to enable any required
-customization.
+Binary executables and Java source code 
+are provided for both the Adapter Simulator and the Client
+Simulator. 
+
+- The binary executables are available in a zip file
+under the [release](https://github.com/Lightstreamer/load-test-toolkit/releases)
+section. 
+
+- To compile the source code, a Maven _pom.xml_ is available.
 
 # Architecture
 
@@ -474,18 +480,12 @@ The main parameters affecting that trade-off are the following:
 
   	Tuning the garbage collection requires specific skills, because several
 	collection algorithms with different specific parameters are provide by
-	Oracle/Sun’s JVM. Please look for the Garbage Collection Tuning Guide
+	the JVM. Please look for the Garbage Collection Tuning Guide
 	for your Java installation for an overview of the available algorithms.
 
 	If you experience bad performance, try this GC configuration. Edit
-	LS.s, go to JAVA\_OPTS, and use the following string in place of the
+	LS.sh, go to JAVA\_OPTS, and use the following string in place of the
 	default one: "*-server -XX:NewRatio=1 -XX:SurvivorRatio=4 -Xms256M
 	-Xmx4G*" (this will reduce the occurrence of major garbage collections
 	in favor of minor ones). In case of a test with TLS, the heap limit may
 	need to be higher.
-
-  
-	For scenarios where a true pauseless garbage collection is required (to
-	minimize latencies without reducing scalability) specific Java platforms
-	exist. For example, see Azul Systems
-	([www.azulsystems.com](http://www.azulsystems.com/)).
