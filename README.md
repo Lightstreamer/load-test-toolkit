@@ -415,19 +415,17 @@ net.core.netdev\_max\_backlog = 2500
 
 net.ipv4.netfilter.ip\_conntrack\_max = 1048576
 
-net.ip\_conntrack\_max = 1048576
-
 vm.min\_free\_kbytes = 65536
 
 vm.swappiness = 0
 
 net.ipv4.ip\_local\_port\_range = 1024 65535
 
-For instance, on **Linux**, it the **nf\_conntrack** module is loaded,
+For instance, on **Linux**, if the **nf\_conntrack** module is loaded,
 it may introduce a limit on the connections, which can be enlarged
-through the *net.ip\_conntrack\_max* setting. In fact, we observed such
+through the *net.ipv4.netfilter.ip\_conntrack\_max* setting. In fact, we observed such
 a limit to be set with a default of about 260000 connections when
-deploying the Server through a docker.
+deploying the Server through a Docker container.
 
 ## Activating Latency Reporting
 
