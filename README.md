@@ -1,7 +1,11 @@
-<h1>Lightstreamer – Load Test Toolkit</h1>
-<h2>User's Guide</h2>
-<h5>The Lightstreamer Team <a href="mailto:support@lightstreamer.com">support@lightstreamer.com</a> 
-- Version 4.0, October 1, 2018</h5> 
+
+Lightstreamer – Load Test Toolkit
+=================================
+
+###### Version 4.0, October 1, 2018 
+
+User's Guide
+------------
 
 <!-- START doctoc generated TOC please keep comment here to allow auto update -->
 <!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
