@@ -176,9 +176,9 @@ to raise the user's “hard” limit as well.
 # Getting Started with the First Test
 
 Let's set up the system for a simple test. As for the instructions
-below, we will refer to a simple deployment on two machines: **Machine
-1** hosting Lightstreamer Server and** Machine 2** hosting an instance
-of the Client Simulator.
+below, we will refer to a simple deployment on two machines:
+**Machine 1** hosting Lightstreamer Server and **Machine 2** hosting
+an instance of the Client Simulator.
 
 Configuration of the Adapter Simulator and the Client Simulator is as
 follows:
@@ -194,7 +194,7 @@ follows:
 
 ## Prepare the Two Machines
 
-Make sure the latest version of the chosen **operating system **is being
+Make sure the latest version of the chosen **operating system** is being
 used, with all the patches and updates applied.
 
 Install the latest available release of Java SE Development Kit on both
@@ -351,7 +351,7 @@ meaning of the available parameters._
 
 Both the Client Simulator and the Adapter Simulator contain their own
 log4j configuration file, which can be edited: log\_conf.xml for the
-Client; **adapter\_log\_conf.xml **for the Adapter.
+Client; **adapter\_log\_conf.xml** for the Adapter.
 
 In case you need to simulate **very low frequency scenarios**, where no
 updates should be sent to a session for several seconds or even minutes,
