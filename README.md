@@ -419,6 +419,8 @@ net.core.netdev\_max\_backlog = 2500
 
 net.ipv4.netfilter.ip\_conntrack\_max = 1048576
 
+fs.file-max = 1048576
+
 vm.min\_free\_kbytes = 65536
 
 net.ipv4.ip\_local\_port\_range = 1024 65535
