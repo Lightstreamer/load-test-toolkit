@@ -66,14 +66,17 @@
      <!-- Number of threads allocated to Netty for IO operations. -->
      <!-- param name="nettyThreads">8</param-->
 
-	 <!-- 	Minimum number of different sockets to be used for the create_session requests.
-            If there is a Load Balancer, a high number helps ensuring that the sessions
-            are evenly distributed among the available Server instances, since requests
-            coming from the same socket are expected to be assigned to the same instance. -->
+     <!-- Minimum number of different sockets to be used for the create_session requests.
+          If there is a Load Balancer, a high number helps ensuring that the sessions
+          are evenly distributed among the available Server instances, since requests
+          coming from the same socket are expected to be assigned to the same instance. -->
      <param name="minCreatePool">1</param>
 
-	 <!--  	Number of ports on which each server instance is listening to.
-	 		For example if this number is 3 and the base port (see above) is 80, the ports are 80, 81 and 82. -->
+     <!-- Number of ports on which each server instance is listening to.
+          For example if this number is 3 and the base port (see above) is 80, the ports are 80, 81 and 82.
+          However, the initial create_session requests will always be issued on the base port;
+          so, tests with a Load Balancer and a "control_link" configured on the Server instances
+          are possbile, where only the base port has to be open on the Load Balancer. -->
      <param name="serverPorts">1</param>
  
      <!-- Number of threads allocated to fire user listeners. -->
