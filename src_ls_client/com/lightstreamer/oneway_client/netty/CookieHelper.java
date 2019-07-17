@@ -11,7 +11,6 @@
  */
 package com.lightstreamer.oneway_client.netty;
 
-import java.net.CookieHandler;
 import java.net.CookieManager;
 import java.net.CookieStore;
 import java.net.HttpCookie;
@@ -47,31 +46,32 @@ public class CookieHelper {
 //        log.debug(message);
 //    }
 
-    public static synchronized void addCookies(URI uri, List<HttpCookie> cookies) {
-        CookieHandler handler = getCookieHandler();
-        if (handler instanceof CookieManager) {
-            CookieStore store = ((CookieManager) handler).getCookieStore();
-//            if (log.isDebugEnabled()) {
-//                logCookies("Before adding cookies for " + uri, store.getCookies());
-//                logCookies("Cookies to be added for " + uri, cookies);
-//            }
+    private synchronized void addCookies(URI uri, List<HttpCookie> cookies) {
+        if (! cookies.isEmpty()) {
+            if (cookieManager == null) {
+                cookieManager = createCookieManager(); // we are already synchronized
+            }
+            CookieStore store = cookieManager.getCookieStore();
+//          if (log.isDebugEnabled()) {
+//              logCookies("Before adding cookies for " + uri, store.getCookies());
+//              logCookies("Cookies to be added for " + uri, cookies);
+//          }
             for (HttpCookie cookie : cookies) {
                 store.add(uri, cookie); 
             }
-//            if (log.isDebugEnabled()) {
-//                logCookies("After adding cookies for " + uri, store.getCookies());
-//            }
+//          if (log.isDebugEnabled()) {
+//              logCookies("After adding cookies for " + uri, store.getCookies());
+//          }
         } else {
-//            log.warn("Global CookieHandler not suitable for cookie storage");
+            // we save some processing by using null for an empty store
         }
     }
     
     private static List<HttpCookie> emptyCookieList = Collections.unmodifiableList(new LinkedList<HttpCookie>());
     
-    public static synchronized List<HttpCookie> getCookies(URI uri) {
-        CookieHandler handler = getCookieHandler();
-        if (handler instanceof CookieManager) {
-            CookieStore store = ((CookieManager) handler).getCookieStore();
+    private synchronized List<HttpCookie> getCookies(URI uri) {
+        if (cookieManager != null) {
+            CookieStore store = cookieManager.getCookieStore();
             if (uri == null) {
 //                if (log.isDebugEnabled()) {
 //                    logCookies("While extracting cookies", store.getCookies());
@@ -85,12 +85,11 @@ public class CookieHelper {
                 return store.get(uri);
             }
         } else {
-//            log.warn("Global CookieHandler not suitable for cookie retrieval");
             return emptyCookieList;
         }
     }
     
-  public static String getCookieHeader(URI target) {
+  public String getCookieHeader(URI target) {
       List<HttpCookie> cookieList = getCookies(target);
       if (!cookieList.isEmpty()) {
       
@@ -113,7 +112,7 @@ public class CookieHelper {
       return null;
   }
   
-  public static void saveCookies(URI uri, String cookieString) {
+  public void saveCookies(URI uri, String cookieString) {
     if (cookieString == null) {
 //      log.info("Cookies to be saved for " + uri + ": <none>");
       return;
@@ -123,75 +122,34 @@ public class CookieHelper {
     addCookies(uri, cookieList);
   }
   
-  /**
-   * Private cookie handler used when there is no global handler available (see {@link CookieHandler#setDefault(CookieHandler)}).
-   */
-  private static CookieManager cookieHandler;
+  private CookieManager cookieManager = null;
   
-  /**
-   * True if the next call to {@link CookieHelper#getCookieHandler()} will be the first one. False otherwise.
-   */
-  private static boolean firstTime = true;
+  private static final boolean avoidOldStore;
   
-  /**
-   * If the first time the method is called the user hasn't set a default cookie manager
-   * (see {@link CookieHandler#setDefault(CookieHandler)}), the library creates a local manager. 
-   * Every successive call uses the local manager regardless of whether the user installs
-   * a default manager.
-   * <br>
-   * On the other hand if the user has installed a default cookie manager, 
-   * the library uses the default manager. If the user changes the default manager,
-   * the library uses the new manager. If the user removes the default manager,
-   * the library doesn't manage cookies.
-   */
-  private static synchronized CookieHandler getCookieHandler() {
-      if (firstTime) {
-          firstTime = false;
-          if (CookieHandler.getDefault() == null) {
-              cookieHandler = new CookieManager(null, java.net.CookiePolicy.ACCEPT_ALL);
-//              log.info("Setting up custom CookieHandler: " + cookieHandler);
-              CookieStore defaultStore = cookieHandler.getCookieStore();
-//              log.info("Default CookieStore type: " + defaultStore.getClass().getName());
-              if (defaultStore.getClass().getName().equals("sun.net.www.protocol.http.InMemoryCookieStore")
-                      || defaultStore.getClass().getName().equals("java.net.CookieStoreImpl")) {
-                  // old cookie store; some of them are flawed; use a replacement
-                  cookieHandler = new CookieManager(new Java7CookieStore(), java.net.CookiePolicy.ACCEPT_ALL);
-//                  log.info("Improving the custom CookieHandler: " + cookieHandler);
-              }
-          } else {
-//              log.info("Will use the default CookieHandler");
-          }
-      }
-      if (cookieHandler != null) {
-          return cookieHandler;
+  static {
+      CookieManager manager = new CookieManager(null, java.net.CookiePolicy.ACCEPT_ALL);
+      CookieStore defaultStore = manager.getCookieStore();
+//      log.info("Default CookieStore type: " + defaultStore.getClass().getName());
+      if (defaultStore.getClass().getName().equals("sun.net.www.protocol.http.InMemoryCookieStore")
+              || defaultStore.getClass().getName().equals("java.net.CookieStoreImpl"))
+      {
+          // old cookie store; some of them are flawed; use a replacement
+          avoidOldStore = true;
       } else {
-          CookieHandler currentHandler = CookieHandler.getDefault();
-//          if (log.isDebugEnabled()) {
-//              log.debug("Using the current default CookieHandler: " + currentHandler);
-//          }
-          return currentHandler;
+          avoidOldStore = false;
       }
   }
   
-  /**
-   * Returns true if the internal CookieManager, to be used
-   * when a default cookie handler is not supplied, is set
-   */
-  public static synchronized boolean isCookieHandlerLocal() {
-      getCookieHandler(); // to determine it as a side effect, if needed
-      return cookieHandler != null;
+  private static CookieManager createCookieManager() {
+      if (! avoidOldStore) {
+          CookieManager manager = new CookieManager(null, java.net.CookiePolicy.ACCEPT_ALL);
+//          log.info("Setting up custom CookieManager: " + newManager);
+          return manager;
+      } else {
+          CookieManager manager = new CookieManager(new Java7CookieStore(), java.net.CookiePolicy.ACCEPT_ALL);
+//          log.info("Improving the custom CookieHandler: " + manager);
+          return manager;
+      }
   }
-  
-  /**
-   * TEST ONLY
-   * resets the state of the CookieHelper class
-   */
-  public static synchronized void reset() {
-//      if (cookieHandler != null) {
-//          log.info("Discarding the custom CookieHandler");
-//      }
-      cookieHandler = null;
-      firstTime = true;
-  }
-  
+
 }

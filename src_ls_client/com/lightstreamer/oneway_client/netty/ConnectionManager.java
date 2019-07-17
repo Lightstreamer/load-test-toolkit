@@ -155,7 +155,7 @@ public class ConnectionManager {
         String protocol = (session.ssl ? "https://" : "http://");
         final URI uri = LsUtils.uri(protocol + host + ":" + port + path);
         
-        final FullHttpRequest httpRequest = buildHttpRequest(host, port, path, postMsg, uri);
+        final FullHttpRequest httpRequest = buildHttpRequest(host, port, path, postMsg, session, uri);
         
         MyInetSocketAddress key = new MyInetSocketAddress(host, port, session.ssl, session.instanceId);
         final SimpleChannelPool chPool = httpPoolMap.get(key);
@@ -240,7 +240,7 @@ public class ConnectionManager {
                     ChannelPromise handshakerPromise = ch1.newPromise();
                     DefaultHttpHeaders customHeaders = new DefaultHttpHeaders();
                     /* send cookies */
-                    String cookies = CookieHelper.getCookieHeader(uri);
+                    String cookies = session.getLocalCookieHelper().getCookieHeader(uri);
                     if (cookies != null && cookies.length() > 0) {
                         customHeaders.set(HttpHeaderNames.COOKIE,cookies);
                     }
@@ -337,7 +337,7 @@ public class ConnectionManager {
         String protocol = (session.ssl ? "https://" : "http://");
         final URI uri = LsUtils.uri(protocol + host + ":" + port + path);
         
-        final FullHttpRequest httpRequest = buildHttpRequest(host, port, path, postMsg, uri);
+        final FullHttpRequest httpRequest = buildHttpRequest(host, port, path, postMsg, session, uri);
         
         MyInetSocketAddress key = new MyInetSocketAddress(host, port, session.ssl, session.instanceId);
         final SimpleChannelPool chPool = httpPoolMap.get(key);
@@ -378,13 +378,13 @@ public class ConnectionManager {
         });
     }
 
-    private FullHttpRequest buildHttpRequest(String host, int port, String path, String postMsg, final URI uri) {
+    private FullHttpRequest buildHttpRequest(String host, int port, String path, String postMsg, Session session, final URI uri) {
         final FullHttpRequest httpRequest = new DefaultFullHttpRequest(HttpVersion.HTTP_1_1, HttpMethod.POST, path);
         httpRequest.headers().set("Host", host  + ":" + port);
         httpRequest.headers().set(HttpHeaderNames.USER_AGENT, "Lightstreamer-client-simulator");
         httpRequest.headers().set(HttpHeaderNames.CONTENT_TYPE, "text/plain; charset=UTF-8");
         /* send cookies */
-        String cookies = CookieHelper.getCookieHeader(uri);
+        String cookies = session.getLocalCookieHelper().getCookieHeader(uri);
         if (cookies != null && cookies.length() > 0) {
           httpRequest.headers().set(HttpHeaderNames.COOKIE,cookies);
         }
@@ -529,7 +529,7 @@ public class ConnectionManager {
                 }
                 /* save cookies */
                 for (String cookie : response.headers().getAll(HttpHeaderNames.SET_COOKIE)) {
-                    CookieHelper.saveCookies(uri, cookie);
+                    session.getLocalCookieHelper().saveCookies(uri, cookie);
                 }
                 
             } else if (msg instanceof HttpContent) {
@@ -681,7 +681,7 @@ public class ConnectionManager {
                     handshakerPromise.setSuccess();
                     /* save cookies */
                     for (String cookie : resp.headers().getAll(HttpHeaderNames.SET_COOKIE)) {
-                        CookieHelper.saveCookies(handshaker.uri(), cookie);
+                        session.getLocalCookieHelper().saveCookies(handshaker.uri(), cookie);
                     }
                     
                 } catch (Throwable e) {
@@ -836,7 +836,7 @@ public class ConnectionManager {
             String protocol = (session.ssl ? "https://" : "http://");
             final URI uri = LsUtils.uri(protocol + host + ":" + port + path);
             
-            final FullHttpRequest httpRequest = buildHttpRequest(host, port, path, postMsg, uri);
+            final FullHttpRequest httpRequest = buildHttpRequest(host, port, path, postMsg, session, uri);
             
             MyInetSocketAddress key = new MyInetSocketAddress(host, port, session.ssl, session.instanceId);
             final SimpleChannelPool chPool = httpPoolMap.get(key);

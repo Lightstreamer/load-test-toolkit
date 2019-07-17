@@ -52,6 +52,8 @@ public class Session {
     volatile long bindStartTime;
     volatile long subStartTime;
     
+    final CookieHelper localCookieHelper;
+    
     public Session(LightstreamerClient client) {
         this.client = client;
         URI uri = LsUtils.uri(client.serverUrl);
@@ -65,6 +67,11 @@ public class Session {
         this.instanceId = factory.getInstanceCounter().next();
         this.connectionManager = factory.getConnectionManager();
         this.multiPortMap = factory.getMultiPortMap();
+        this.localCookieHelper = new CookieHelper();
+    }
+    
+    public CookieHelper getLocalCookieHelper() {
+        return localCookieHelper;
     }
     
     /**
