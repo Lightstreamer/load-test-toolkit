@@ -2,7 +2,7 @@
 Lightstreamer – Load Test Toolkit
 =================================
 
-###### Version 4.0, October 1, 2018 
+###### Version 4.0.1, July 17, 2019 
 
 User's Guide
 ------------
