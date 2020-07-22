@@ -2,7 +2,7 @@
 Lightstreamer – Load Test Toolkit
 =================================
 
-###### Version 4.0.1, July 17, 2019 
+###### Version 4.0.3, July 22, 2020 
 
 User's Guide
 ------------
@@ -203,15 +203,12 @@ to install the 64-bit version of the JDK.
 
 ## Install the Software on Machine 1
 
-Install **Lightstreamer Server v. 6.1 (or newer)** on the Server
+Install **Lightstreamer Server v. 7.1 (or newer)** on the Server
 machine, configure it following the GETTING\_STARTED.TXT instructions contained in the package, and verify
 that it works correctly, by running one of the preinstalled demos. 
 
-**NOTE**: If you use Lightstreamer 6.1.0, then you need
-Allegro/Presto/Vivace for the test, as Lightstreamer Moderato is not
-compatible with LLTT. If you use Lightstreamer 7 or higher, then, to
-fully leverage the LLTT features, you need to configure the
-Lightstreamer server with Enterprise Edition, since with Community
+**NOTE**: To fully leverage the LLTT features, you need to configure
+the Lightstreamer server with Enterprise Edition, since with Community
 Edition the test could be compromised by the limitations of the edition.
 
 Open **lightstreamer\_conf.xml** (under the “conf” folder) and make sure
