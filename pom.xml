@@ -48,13 +48,11 @@
 	</build>
 
 	<dependencies>
-		<dependency>
-			<groupId>com.lightstreamer</groupId>
-			<artifactId>ls-adapter-interface</artifactId>
-			<version>7.0.1</version>
-			<scope>system</scope>
-			<systemPath>${project.basedir}/lib/ls-adapter-interface.jar</systemPath>
-		</dependency>
+        <dependency>
+            <groupId>com.lightstreamer</groupId>
+            <artifactId>ls-adapter-inprocess</artifactId>
+            <version>7.3.0</version>
+        </dependency>
 		<dependency>
 			<groupId>io.netty</groupId>
 			<artifactId>netty-codec-http</artifactId>
