@@ -283,14 +283,18 @@ sure you have the following settings:
 	<logger name="LightstreamerLogger.pump" level="WARN" />
 	```  
 
-Install the **Adapter Simulator**: open the “adapters” folder of the
-Lightstreamer Server installation and copy the “AdapterSimulator” folder
-from the LLTT inside it.
+Install the **Adapter Simulator**: get the LLTT package under the
+[release](https://github.com/Lightstreamer/load-test-toolkit/releases)
+section; then extract from the zipped package the “AdapterSimulator”
+folder and copy it in the “adapters” folder of the
+Lightstreamer Server installation.
 
 ## Install the Software on Machine 2
 
-To install the **Client Simulator**, copy the “ClientSimulator” folder
-from the LLTT to Machine 2.
+To install the **Client Simulator**, get the LLTT package under the
+[release](https://github.com/Lightstreamer/load-test-toolkit/releases)
+section; then extract from the zipped package the “ClientSimulator”
+folder and copy it to a folder of choice.
 
 Edit the launch script file (“**start\_client.sh**” for Linux, or
 “**start\_client.bat**” for Windows) in order to set the correct
@@ -376,7 +380,8 @@ them).
 
 ## Tuning the Software and the Operating System
 
-Edit **LS.sh** (under the “bin/unix-like” folder) or **LS.bat** (under
+In Lightstreamer Server installation, edit **LS.sh**
+(under the “bin/unix-like” folder) or **LS.bat** (under
 the “bin\\windows” folder) as follows:
 
   - If needed, tune the **Java heap configuration** (min and max memory)
@@ -433,7 +438,8 @@ deploying the Server through a Docker container.
 To turn on latency reporting on a Client Simulator instance, you need to
 
   - Set \<param name="**injectTimestamps**"\> to **true** in the
-    **adapters.xml** file of Lightstreamer Server.
+    **adapters.xml** file of the Adapter Simulator within
+    Lightstreamer Server installation.
   - Set priority value to **INFO** for the
     "**com.lightstreamer.load\_test.reports.latency\_reporting**"
     category in the **log\_conf.xml** file of the Client Simulator,
@@ -477,14 +483,14 @@ The main parameters affecting that trade-off are the following:
     the application) should be chosen (again, as part of a trade-off
     with scalability).
 
-  	Tuning the garbage collection requires specific skills, because several
-	collection algorithms with different specific parameters are provide by
-	the JVM. Please look for the Garbage Collection Tuning Guide
-	for your Java installation for an overview of the available algorithms.
+    Tuning the garbage collection requires specific skills, because several
+    collection algorithms with different specific parameters are provide by
+    the JVM. Please look for the Garbage Collection Tuning Guide
+    for your Java installation for an overview of the available algorithms.
+    If a "pauseless collector" is available, then this is obviously the
+    best choice. If not, you may try the following settings:
+    "*-server -Xms4G -Xmx4G -XX:+UseG1GC -XX:MaxGCPauseMillis=1000 -XX:G1ReservePercent=20 -XX:+AlwaysPreTouch*"
+    In case of a test with TLS, the heap limit may need to be higher.
 
-	If you experience bad performance, try this GC configuration. Edit
-	LS.sh, go to JAVA\_OPTS, and use the following string in place of the
-	default one: "*-server -XX:NewRatio=1 -XX:SurvivorRatio=4 -Xms256M
-	-Xmx4G*" (this will reduce the occurrence of major garbage collections
-	in favor of minor ones). In case of a test with TLS, the heap limit may
-	need to be higher.
+    To configure the garbage collector, edit **LS.sh** or **LS.bat**,
+    and modify JAVA\_OPTS.
