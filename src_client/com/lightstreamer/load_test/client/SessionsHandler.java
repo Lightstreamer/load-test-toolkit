@@ -40,12 +40,94 @@ public class SessionsHandler {
      
     ClientConfiguration conf;
     private StatisticsManager statsManager = null; 
-    
-    //we extract info from conf and prepare these 5 variables
-    private String schemaName = "";
+
+    String[] stringkeys_sc2 = { "ltest-[key=Apple]", "ltest-[key=Banana]",
+            "ltest-[key=Orange]", "ltest-[key=Grape]",
+            "ltest-[key=Pineapple]", "ltest-[key=Strawberry]", "ltest-[key=Watermelon]",
+            "ltest-[key=Mango]",
+            "ltest-[key=Kiwi]", "ltest-[key=Lemon]", "ltest-[key=Peach]",
+            "ltest-[key=Cherry]", "ltest-[key=Blueberry]",
+            "ltest-[key=Raspberry]", "ltest-[key=Blackberry]", "ltest-[key=Coconut]",
+            "ltest-[key=Pomegranate]",
+            "ltest-[key=Cantaloupe]", "ltest-[key=Apricot]", "ltest-[key=Fig]",
+            "ltest-[key=Plum]", "ltest-[key=Pear]",
+            "ltest-[key=Avocado]", "ltest-[key=Lychee]", "ltest-[key=Guava]",
+            "ltest-[key=Dragonfruit]",
+            "ltest-[key=Passionfruit]", "ltest-[key=Papaya]", "ltest-[key=Melon]",
+            "ltest-[key=Lime]",
+            "ltest-[key=Nectarine]", "ltest-[key=Persimmon]", "ltest-[key=Starfruit]",
+            "ltest-[key=Tangerine]",
+            "ltest-[key=Durian]", "ltest-[key=Kumquat]", "ltest-[key=Cranberry]",
+            "ltest-[key=Rambutan]",
+            "ltest-[key=Mangosteen]", "ltest-[key=Jackfruit]" };
+
+    String[] stringkeys_sc3 = { "jsontest-[key=James]", "jsontest-[key=John]",
+            "jsontest-[key=Robert]", "jsontest-[key=Michael]",
+            "jsontest-[key=William]", "jsontest-[key=David]", "jsontest-[key=Richard]",
+            "jsontest-[key=Joseph]",
+            "jsontest-[key=Charles]", "jsontest-[key=Thomas]", "jsontest-[key=Daniel]",
+            "jsontest-[key=Matthew]", "jsontest-[key=Christopher]",
+            "jsontest-[key=George]", "jsontest-[key=Brian]", "jsontest-[key=Edward]",
+            "jsontest-[key=Ronald]",
+            "jsontest-[key=Anthony]", "jsontest-[key=Kevin]", "jsontest-[key=Jason]",
+            "jsontest-[key=Gary]", "jsontest-[key=Timothy]",
+            "jsontest-[key=Jose]", "jsontest-[key=Larry]", "jsontest-[key=Jeffrey]",
+            "jsontest-[key=Frank]",
+            "jsontest-[key=Scott]", "jsontest-[key=Eric]", "jsontest-[key=Stephen]",
+            "jsontest-[key=Andrew]",
+            "jsontest-[key=Raymond]", "jsontest-[key=Gregory]", "jsontest-[key=Joshua]",
+            "jsontest-[key=Jerry]",
+            "jsontest-[key=Dennis]", "jsontest-[key=Walter]", "jsontest-[key=Patrick]",
+            "jsontest-[key=Peter]",
+            "jsontest-[key=Harold]", "jsontest-[key=Douglas]" };
+
+    String[] stringkeys_sc3jp = { "ltest-[key=James]", "ltest-[key=John]",
+            "ltest-[key=Robert]", "ltest-[key=Michael]",
+            "ltest-[key=William]", "ltest-[key=David]", "ltest-[key=Richard]",
+            "ltest-[key=Joseph]",
+            "ltest-[key=Charles]", "ltest-[key=Thomas]", "ltest-[key=Daniel]",
+            "ltest-[key=Matthew]", "ltest-[key=Christopher]",
+            "ltest-[key=George]", "ltest-[key=Brian]", "ltest-[key=Edward]",
+            "ltest-[key=Ronald]",
+            "ltest-[key=Anthony]", "ltest-[key=Kevin]", "ltest-[key=Jason]",
+            "ltest-[key=Gary]", "ltest-[key=Timothy]",
+            "ltest-[key=Jose]", "ltest-[key=Larry]", "ltest-[key=Jeffrey]",
+            "ltest-[key=Frank]",
+            "ltest-[key=Scott]", "ltest-[key=Eric]", "ltest-[key=Stephen]",
+            "ltest-[key=Andrew]",
+            "ltest-[key=Raymond]", "ltest-[key=Gregory]", "ltest-[key=Joshua]",
+            "ltest-[key=Jerry]",
+            "ltest-[key=Dennis]", "ltest-[key=Walter]", "ltest-[key=Patrick]",
+            "ltest-[key=Peter]",
+            "ltest-[key=Harold]", "ltest-[key=Douglas]" };
+
+    String[] ___strings = { "jsontest-[sndValue=Apple]", "jsontest-[sndValue=Banana]", "jsontest-[sndValue=Orange]",
+            "jsontest-[sndValue=Grape]", "jsontest-[sndValue=Pineapple]", "jsontest-[sndValue=Strawberry]",
+            "jsontest-[sndValue=Watermelon]", "jsontest-[sndValue=Mango]", "jsontest-[sndValue=Kiwi]",
+            "jsontest-[sndValue=Lemon]",
+            "jsontest-[sndValue=Peach]", "jsontest-[sndValue=Cherry]", "jsontest-[sndValue=Blueberry]",
+            "jsontest-[sndValue=Raspberry]",
+            "jsontest-[sndValue=Blackberry]", "jsontest-[sndValue=Coconut]", "jsontest-[sndValue=Pomegranate]",
+            "jsontest-[sndValue=Cantaloupe]",
+            "jsontest-[sndValue=Apricot]", "jsontest-[sndValue=Fig]", "jsontest-[sndValue=Plum]",
+            "jsontest-[sndValue=Pear]",
+            "jsontest-[sndValue=Avocado]", "jsontest-[sndValue=Lychee]", "jsontest-[sndValue=Guava]",
+            "jsontest-[sndValue=Dragonfruit]",
+            "jsontest-[sndValue=Passionfruit]", "jsontest-[sndValue=Papaya]", "jsontest-[sndValue=Melon]",
+            "jsontest-[sndValue=Lime]",
+            "jsontest-[sndValue=Nectarine]", "jsontest-[sndValue=Persimmon]", "jsontest-[sndValue=Starfruit]",
+            "jsontest-[sndValue=Tangerine]",
+            "jsontest-[sndValue=Durian]", "jsontest-[sndValue=Kumquat]", "jsontest-[sndValue=Cranberry]",
+            "jsontest-[sndValue=Rambutan]",
+            "jsontest-[sndValue=Mangosteen]", "jsontest-[sndValue=Jackfruit]" };
+
+    String item_sc1 = "ltest";
+
+    // we extract info from conf and prepare these 5 variables
     private int firstItem;
     private int lastItem;
     private int numItems;
+    private Random random = new Random();
     
     private static final boolean FAILED_SESSION = true;
     static final boolean FAILED_SUBSCRIPTION = false;
@@ -54,12 +136,7 @@ public class SessionsHandler {
         
     public SessionsHandler(ClientConfiguration conf) {
       this.conf = conf;
-      
-      for (int i=1; i<=conf.numberOfFields-1; i++) {
-          schemaName += Constants.FIELD_PREFIX+i + " ";
-      }
-      schemaName += Constants.FIELD_PREFIX+conf.numberOfFields;
-            
+
       if (Logger.getLogger(Constants.LATENCY_LOGGER).isInfoEnabled()) { 
           this.statsManager = new StatisticsManager();
       }
@@ -139,7 +216,7 @@ public class SessionsHandler {
         lsClient.connect();
         
         final Subscription table = configureTable(id);
-        table.addListener(new TableListener(this, id, lsClient, table, statsManager, conf.isSpeedUpReading()));
+        table.addListener(new TableListener(this, id, lsClient, table, statsManager, conf));
         
         if (_logUpdates.isDebugEnabled()) {
             _logUpdates.debug("Subscribing to items for session " + id + "("+table.getItemGroup()+")...");
@@ -149,34 +226,64 @@ public class SessionsHandler {
     
     
     private Subscription configureTable(int id) {
-        String group = null;
-        if (conf.itemRandomExtraction) {
-            group = chooseItemsNumberAtRandom(id);
-        } else {
-            group = chooseItemsNumberAtSameDistance(id);
-        }
-        
-        Subscription table = new Subscription(conf.subscriptionMode);
-        table.setItemGroup(group);
-        table.setFieldSchema(schemaName);
-        table.setRequestedSnapshot("no");
-        
-        if (conf.dataAdapterName != null) {
-            table.setDataAdapter(conf.dataAdapterName);
-        }
-        
+        // String group = null;
+        // if (conf.itemRandomExtraction) {
+        // group = chooseItemsNumberAtRandom(id);
+        // } else {
+        // group = chooseItemsNumberAtSameDistance(id);
+        // }
 
-        if (conf.unfilteredSubscription) {
-            table.setRequestedMaxFrequency("unfiltered");
-        
+        Subscription table = new Subscription(conf.subscriptionMode);
+
+        if ((conf.scenarioLKC.equals("1")) || (conf.scenarioLKC.equals("3jp"))) {
+            String[] fields = { "key", "value", };
+            table.setFields(fields);
+
+            table.setDataAdapter("QuickStart");
+        } else if (conf.scenarioLKC.equals("2")) {
+            String[] fields = { "key", "timestamp", "sndValue", "intNum", "ts", "partition" };
+            table.setFields(fields);
+
+            table.setDataAdapter("JsonStart-k");
         } else {
-            if (conf.resamplingFrequency > 0) {
-                table.setRequestedMaxFrequency("" + conf.resamplingFrequency);
-            }
-            if (conf.resamplingBufferSize > 0) {
-                table.setRequestedBufferSize("" + conf.resamplingBufferSize);
-            }
+            String[] fields = { "key", "firstText", "secondText", "thirdText",
+                    "fourthText", "firstnumber",
+                    "secondNumber", "thirdNumber", "fourthNumber", "hobbies", "timestamp" };
+            table.setFields(fields);
+
+            table.setDataAdapter("JsonStart-k");
         }
+
+        if (conf.scenarioLKC.equals("1")) {
+            table.setItemGroup(item_sc1);
+        } else if (conf.scenarioLKC.equals("3jp")) {
+            int index = random.nextInt(stringkeys_sc3jp.length);
+            table.setItemGroup(stringkeys_sc3jp[index]);
+        } else if ((conf.scenarioLKC.equals("2"))) {
+            int index = random.nextInt(stringkeys_sc2.length);
+            table.setItemGroup(stringkeys_sc2[index]);
+        } else if ((conf.scenarioLKC.equals("3"))) {
+            int index = random.nextInt(stringkeys_sc3.length);
+            table.setItemGroup(stringkeys_sc3[index]);
+        }
+
+        table.setRequestedSnapshot("no");
+
+        // if (conf.dataAdapterName != null) {
+        // table.setDataAdapter(conf.dataAdapterName);
+        // }
+
+        // if (conf.unfilteredSubscription) {
+        // table.setRequestedMaxFrequency("unfiltered");
+
+        // } else {
+        // if (conf.resamplingFrequency > 0) {
+        // table.setRequestedMaxFrequency("" + conf.resamplingFrequency);
+        // }
+        // if (conf.resamplingBufferSize > 0) {
+        // table.setRequestedBufferSize("" + conf.resamplingBufferSize);
+        // }
+        // }
         
         return table;
     }

@@ -15,11 +15,15 @@
 
 package com.lightstreamer.load_test.client;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
 
 import com.lightstreamer.load_test.client.utils.BaseSubscriptionListener;
+import com.lightstreamer.load_test.commons.ClientConfiguration;
 import com.lightstreamer.load_test.commons.Constants;
 import com.lightstreamer.load_test.commons.TimeConversion;
 import com.lightstreamer.oneway_client.ItemUpdate;
@@ -58,16 +62,20 @@ class TableListener extends BaseSubscriptionListener {
     }
     
     private StatisticsManager statsManager;
+    private ClientConfiguration conf;
     private int sessionId = 0;
     StringBuffer update;
 
-    public TableListener(SessionsHandler sessionsHandler, int id, LightstreamerClient lsClient, Subscription table, StatisticsManager statsManager, boolean speedUpReading) {
+    public TableListener(SessionsHandler sessionsHandler, int id, LightstreamerClient lsClient, Subscription table,
+            StatisticsManager statsManager, ClientConfiguration conf) {
         this.sessionsHandler = sessionsHandler;
         this.lsClient = lsClient;
         this.table = table;
         this.statsManager = statsManager;
         this.sessionId = id;
-        this.speedUpReading = speedUpReading;
+        this.conf = conf;
+
+        this.speedUpReading = conf.isSpeedUpReading();
         if(_logUpdates!=null) {
             update = new StringBuffer();
         }
@@ -75,6 +83,8 @@ class TableListener extends BaseSubscriptionListener {
 
     @Override
     public void onSubscriptionError(int code, String message) {
+        _logUpdates.info("Warn - " + code + " - " + message);
+
         this.sessionsHandler.abortSession(sessionId,lsClient,new RuntimeException(code + " " + message),SessionsHandler.FAILED_SUBSCRIPTION);
     }
     
@@ -116,48 +126,82 @@ class TableListener extends BaseSubscriptionListener {
             long simulatorTime=0;
             try {            
                 //the first Constants.SIZE_OF_TIMESTAMP_IN_BYTES characters in the Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX field is my timestamp
-//                String lastValue = values.getNewValue(Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX).substring(0,Constants.SIZE_OF_TIMESTAMP_IN_BYTES);
-                String lastValue = values.getValue(Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX).substring(0,Constants.SIZE_OF_TIMESTAMP_IN_BYTES);
-                simulatorTime = Long.valueOf(lastValue); 
-            } catch(NumberFormatException nfe) {
-                _logLatencies.error(LATENCY_ERROR,nfe);
-                return;
-            } catch(NullPointerException npe) {
-                _logLatencies.error(LATENCY_ERROR,npe);
-                return;
-            } catch(IndexOutOfBoundsException iob) {
-                _logLatencies.error(LATENCY_ERROR,iob);
-                return;
-            } 
-            
-            int delay = (int) (localTime-simulatorTime); 
-            this.statsManager.onData(delay);
-            
-            if (_logUpdates2 != null) {
-                if (localTime-lastLog > 100) {
-                    synchronized(timestampsString) {
-                        if (localTime-lastLog > 100) {
-                            lastLog = localTime;
-                            
-                            timestampsString.setLength(0);
-                            
-                            timestampsString.append(localTime);
-                            timestampsString.append(" - ");
-                            timestampsString.append(simulatorTime);
-                            timestampsString.append(" = ");
-                            timestampsString.append(delay);
-                            timestampsString.append(" | ");
-                            
-                            timestampsString.append("Session ");
-                            timestampsString.append(this.sessionId);
-                            timestampsString.append(" item ");
-                            timestampsString.append(itemPos);
-                            
-                            _logUpdates2.debug(timestampsString);
-                        }
-                    }
+                // String lastValue =
+                // values.getNewValue(Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX).substring(0,Constants.SIZE_OF_TIMESTAMP_IN_BYTES);
+                // String lastValue =
+                // values.getValue(Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX).substring(0,Constants.SIZE_OF_TIMESTAMP_IN_BYTES);
+                // simulatorTime = Long.valueOf(lastValue);
+                // Definisci il formato del timestamp
+
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                String timestampString;
+
+                if (conf.scenarioLKC.equalsIgnoreCase("1")) {
+                    // Scenario 1
+                    timestampString = values.getValue("value").substring(0, 23);
+                } else if ((conf.scenarioLKC.equalsIgnoreCase("2")) || (conf.scenarioLKC.equalsIgnoreCase("3"))) {
+                    // Scenario 2 - 3
+                    timestampString = values.getValue("timestamp");
+                } else {
+                    // Scenario 3 jp
+                    String tmp = values.getValue("value");
+
+                    _logLatencies.debug("Value: " + tmp);
+
+                    int indx = tmp.indexOf("timestamp", 1);
+                    timestampString = tmp.substring(indx + 20, indx + 43);
                 }
-                
+
+                _logLatencies.debug("Timestamp: " + timestampString);
+
+                try {
+                    // Analizza la stringa del timestamp in un oggetto Date
+                    Date date2 = sdf.parse(timestampString);
+
+                    // Ottieni i millisecondi dalla data
+                    simulatorTime = date2.getTime();
+
+                    int delay = (int) (localTime - simulatorTime);
+                    this.statsManager.onData(delay);
+
+                    if (_logUpdates2 != null) {
+                        if (localTime - lastLog > 100) {
+                            synchronized (timestampsString) {
+                                if (localTime - lastLog > 100) {
+                                    lastLog = localTime;
+
+                                    timestampsString.setLength(0);
+
+                                    timestampsString.append(localTime);
+                                    timestampsString.append(" - ");
+                                    timestampsString.append(simulatorTime);
+                                    timestampsString.append(" = ");
+                                    timestampsString.append(delay);
+                                    timestampsString.append(" | ");
+
+                                    timestampsString.append("Session ");
+                                    timestampsString.append(this.sessionId);
+                                    timestampsString.append(" item ");
+                                    timestampsString.append(itemPos);
+
+                                    _logUpdates2.debug(timestampsString);
+                                }
+                            }
+                        }
+
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            } catch (NumberFormatException nfe) {
+                _logLatencies.error(LATENCY_ERROR, nfe);
+                return;
+            } catch (NullPointerException npe) {
+                _logLatencies.error(LATENCY_ERROR, npe);
+                return;
+            } catch (IndexOutOfBoundsException iob) {
+                _logLatencies.error(LATENCY_ERROR, iob);
+                return;
             }
             
         }

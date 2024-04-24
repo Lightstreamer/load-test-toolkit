@@ -77,7 +77,7 @@ import io.netty.util.concurrent.FutureListener;
  */
 public class ConnectionManager {
     
-    protected static final String TLCP_VER = "TLCP-2.0.0";
+    protected static final String TLCP_VER = "TLCP-2.5.0";
     
     private final AtomicInteger nextReqId = new AtomicInteger();
     private final NioEventLoopGroup group;

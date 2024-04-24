@@ -69,12 +69,19 @@ public class EncodingUtils {
                   values.add("");
 
               } else if (buf[firstChar] == '^') { // step D
-//                  int count = myParseInt(value.substring(1), "compression", message);
-                  int n = b2int(buf, firstChar + 1, fieldEnd);
-                  while (n-- > 0) {
-                      values.add(UNCHANGED);
-                  }
+                  // int count = myParseInt(value.substring(1), "compression", message);
+                  if (buf[firstChar + 1] == 'P') {
+                      // System.out.println("P");
+                      String unquoted = EncodingUtils.unquote(buf, firstChar + 1, fieldEnd);
+                      values.add(unquoted);
 
+                      // System.out.println("Field diff: " + unquoted);
+                  } else {
+                      int n = b2int(buf, firstChar + 1, fieldEnd);
+                      while (n-- > 0) {
+                          values.add(UNCHANGED);
+                      }
+                  }
               } else { // step E
 //                  String value = b2str(buf, fieldStart + 1, fieldEnd);
                   String unquoted = EncodingUtils.unquote(buf, firstChar, fieldEnd);

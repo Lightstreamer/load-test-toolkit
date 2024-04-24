@@ -49,6 +49,7 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
         new Field("port",INT,true),
         new Field("adapterSetName",STRING,true),
         new Field("dataAdapterName",STRING,false),
+            new Field("scenarioLKC", STRING, false),
         new Field("numberOfSessions",INT,true),
         new Field("itemsPerSession",INT,true),
         new Field("itemRandomExtraction",BOOL,false),
@@ -77,6 +78,8 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
     public int port = -1;
     public String adapterSetName = null; 
     public String dataAdapterName = null; //optional
+
+    public String scenarioLKC = "1";
 
     public int numberOfSessions = -1;
     public int itemsPerSession = -1;

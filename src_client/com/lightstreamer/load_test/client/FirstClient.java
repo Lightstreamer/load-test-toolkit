@@ -42,7 +42,7 @@ public class FirstClient {
         schema = ClientConfiguration.getServerSentParametersList();
         
         String serverUrl = firstClientConf.protocol + firstClientConf.host + ":" + firstClientConf.port;
-        LightstreamerClient client = new LightstreamerClient(serverUrl, firstClientConf.adapterSetName);
+        LightstreamerClient client = new LightstreamerClient(serverUrl, "LOAD_TESTS");
         client.connectionOptions.setForcedTransport("WS-STREAMING");
         client.addListener(new BaseClientListener() {
             @Override
@@ -58,9 +58,7 @@ public class FirstClient {
         sub.setItems(group);
         sub.setFields(schema);
         sub.setRequestedSnapshot("yes");
-        if (firstClientConf.dataAdapterName != null) {
-            sub.setDataAdapter(firstClientConf.dataAdapterName);
-        }
+
         sub.addListener(new BaseSubscriptionListener() {
             @Override
             public void onSubscriptionError(int code, String message) {
