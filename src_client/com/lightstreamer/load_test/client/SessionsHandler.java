@@ -235,7 +235,7 @@ public class SessionsHandler {
 
         Subscription table = new Subscription(conf.subscriptionMode);
 
-        if ((conf.scenarioLKC.equals("1")) || (conf.scenarioLKC.equals("3jp"))) {
+        if ((conf.scenarioLKC.equals("1")) || (conf.scenarioLKC.equals("3jp")) || (conf.scenarioLKC.equals("3td"))) {
             String[] fields = { "key", "value", };
             table.setFields(fields);
 
@@ -246,7 +246,7 @@ public class SessionsHandler {
 
             table.setDataAdapter("JsonStart-k");
         } else {
-            String[] fields = { "key", "firstText", "secondText", "thirdText",
+            String[] fields = { "key", "changes", "firstText", "secondText", "thirdText",
                     "fourthText", "firstnumber",
                     "secondNumber", "thirdNumber", "fourthNumber", "hobbies", "timestamp" };
             table.setFields(fields);
@@ -256,7 +256,7 @@ public class SessionsHandler {
 
         if (conf.scenarioLKC.equals("1")) {
             table.setItemGroup(item_sc1);
-        } else if (conf.scenarioLKC.equals("3jp")) {
+        } else if ((conf.scenarioLKC.equals("3jp")) || (conf.scenarioLKC.equals("3td"))) {
             int index = random.nextInt(stringkeys_sc3jp.length);
             table.setItemGroup(stringkeys_sc3jp[index]);
         } else if ((conf.scenarioLKC.equals("2"))) {
@@ -268,6 +268,8 @@ public class SessionsHandler {
         }
 
         table.setRequestedSnapshot("no");
+
+        table.setRequestedMaxFrequency("unfiltered");
 
         // if (conf.dataAdapterName != null) {
         // table.setDataAdapter(conf.dataAdapterName);

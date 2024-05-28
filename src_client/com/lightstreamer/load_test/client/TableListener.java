@@ -134,7 +134,7 @@ class TableListener extends BaseSubscriptionListener {
                 // Definisci il formato del timestamp
 
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                String timestampString;
+                String timestampString = "";
 
                 if (conf.scenarioLKC.equalsIgnoreCase("1")) {
                     // Scenario 1
@@ -142,14 +142,17 @@ class TableListener extends BaseSubscriptionListener {
                 } else if ((conf.scenarioLKC.equalsIgnoreCase("2")) || (conf.scenarioLKC.equalsIgnoreCase("3"))) {
                     // Scenario 2 - 3
                     timestampString = values.getValue("timestamp");
-                } else {
-                    // Scenario 3 jp
+                } else if (conf.scenarioLKC.equalsIgnoreCase("3jp")) {
+                    // Scenario 3 jp (JSON patch)
                     String tmp = values.getValue("value");
 
                     _logLatencies.debug("Value: " + tmp);
 
                     int indx = tmp.indexOf("timestamp", 1);
                     timestampString = tmp.substring(indx + 20, indx + 43);
+                } else if (conf.scenarioLKC.equalsIgnoreCase("3td")) {
+                    // Scenario 3 td (TLCP diff)
+                    // no value.
                 }
 
                 _logLatencies.debug("Timestamp: " + timestampString);

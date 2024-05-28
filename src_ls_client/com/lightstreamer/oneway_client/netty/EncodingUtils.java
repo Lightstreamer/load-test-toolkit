@@ -76,6 +76,12 @@ public class EncodingUtils {
                       values.add(unquoted);
 
                       // System.out.println("Field diff: " + unquoted);
+                  } else if (buf[firstChar + 1] == 'T') {
+                      // System.out.println("P");
+                      String unquoted = EncodingUtils.unquote(buf, firstChar + 1, fieldEnd);
+                      values.add(unquoted);
+
+                    // System.out.println("Field diff: " + unquoted);
                   } else {
                       int n = b2int(buf, firstChar + 1, fieldEnd);
                       while (n-- > 0) {
