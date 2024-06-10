@@ -56,7 +56,7 @@ As for the client simulator configuration, the main parameters to set are:
            and javax.net.ssl.trustStorePassword JVM properties, as described in
            the Java documentation. -->
     <param name="protocol">ws://</param>
-    <param name="host">ec2-18-201-228-81.eu-west-1.compute.amazonaws.com</param>
+    <param name="host">localhost</param>
     <param name="port">8080</param>
 
     <param name="scenarioLKC">3td</param>
