@@ -66,7 +66,7 @@ As for the client simulator configuration, the main parameters to set are:
          - 3: Corresponds to scenario number 3, where one of 40 possible items is randomly selected, and the message is divided into several fields.
          - 3jp: Corresponds to a variant of scenario number 3 that utilizes the JSON Patch algorithm. One of 40 possible items is randomly selected. Although there is only one field, deltas derived from the application of JSON Patch will be received.
     -->
-    <param name="scenarioLKC">3td</param>
+    <param name="scenarioLKC">1</param>
 
     <!-- This is the adapter set name of the Adapter Simulator. -->
     <param name="adapterSetName">KafkaConnector</param>
