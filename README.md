@@ -59,6 +59,13 @@ As for the client simulator configuration, the main parameters to set are:
     <param name="host">localhost</param>
     <param name="port">8080</param>
 
+    <!-- Select the type of subscriptions to execute based on the simulation scenario.
+         The possible values are:
+         - 1: Corresponds to scenario number 1, with a single item and a single field.
+         - 2: Corresponds to scenario number 2, where one of 40 possible items is randomly selected, with a single field.
+         - 3: Corresponds to scenario number 3, where one of 40 possible items is randomly selected, and the message is divided into several fields.
+         - 3jp: Corresponds to a variant of scenario number 3 that utilizes the JSON Patch algorithm. One of 40 possible items is randomly selected. Although there is only one field, deltas derived from the application of JSON Patch will be received.
+    -->
     <param name="scenarioLKC">3td</param>
 
     <!-- This is the adapter set name of the Adapter Simulator. -->
