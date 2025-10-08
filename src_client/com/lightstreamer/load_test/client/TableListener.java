@@ -35,6 +35,8 @@ class TableListener extends BaseSubscriptionListener {
     private final SessionsHandler sessionsHandler;
     private final LightstreamerClient lsClient;
     private final Subscription table;
+
+    
     /**
      * When the flag is true, the client tries to optimize the reading by not decoding SSL data.
      */
@@ -63,6 +65,7 @@ class TableListener extends BaseSubscriptionListener {
     
     private StatisticsManager statsManager;
     private ClientConfiguration conf;
+    private String timestamp_field;
     private int sessionId = 0;
     StringBuffer update;
 
@@ -79,6 +82,8 @@ class TableListener extends BaseSubscriptionListener {
         if(_logUpdates!=null) {
             update = new StringBuffer();
         }
+
+        this.timestamp_field = conf.tsField4Latency;
     }
 
     @Override
@@ -101,7 +106,7 @@ class TableListener extends BaseSubscriptionListener {
     
     @Override
     public void onItemUpdate(ItemUpdate values) {
-        long localTime = TimeConversion.getTimeMillis();
+        
         int itemPos = values.getItemPos();
         
         if (_logUpdates != null) {
@@ -125,44 +130,26 @@ class TableListener extends BaseSubscriptionListener {
         if (statsManager != null) {
             long simulatorTime=0;
             try {            
-                //the first Constants.SIZE_OF_TIMESTAMP_IN_BYTES characters in the Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX field is my timestamp
-                // String lastValue =
-                // values.getNewValue(Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX).substring(0,Constants.SIZE_OF_TIMESTAMP_IN_BYTES);
-                // String lastValue =
-                // values.getValue(Constants.SIMULATOR_TIMESTAMP_FIELD_INDEX).substring(0,Constants.SIZE_OF_TIMESTAMP_IN_BYTES);
-                // simulatorTime = Long.valueOf(lastValue);
-                // Definisci il formato del timestamp
-
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                String timestampString = "";
-
-                if (conf.scenarioLKC.equalsIgnoreCase("1")) {
-                    // Scenario 1
-                    timestampString = values.getValue("value").substring(0, 23);
-                } else if ((conf.scenarioLKC.equalsIgnoreCase("2")) || (conf.scenarioLKC.equalsIgnoreCase("3"))) {
-                    // Scenario 2 - 3
-                    timestampString = values.getValue("timestamp");
-                } else if (conf.scenarioLKC.equalsIgnoreCase("3jp")) {
-                    // Scenario 3 jp (JSON patch)
-                    String tmp = values.getValue("value");
-
-                    _logLatencies.debug("Value: " + tmp);
-
-                    int indx = tmp.indexOf("timestamp", 1);
-                    timestampString = tmp.substring(indx + 20, indx + 43);
-                } else if (conf.scenarioLKC.equalsIgnoreCase("3td")) {
-                    // Scenario 3 td (TLCP diff)
-                    // no value.
-                }
+                String timestampString = values.getValue(timestamp_field);
 
                 _logLatencies.debug("Timestamp: " + timestampString);
 
                 try {
-                    // Analizza la stringa del timestamp in un oggetto Date
-                    Date date2 = sdf.parse(timestampString);
-
-                    // Ottieni i millisecondi dalla data
-                    simulatorTime = date2.getTime();
+                    // Se il timestamp è nel formato "timestamp=1759747213345", estraiamo solo la parte numerica
+                    if (timestampString != null && timestampString.contains("=")) {
+                        timestampString = timestampString.split("=")[1];
+                    }
+                    
+                    // Prova prima a parsare come timestamp epoch (millisecondi)
+                    try {
+                        simulatorTime = Long.parseLong(timestampString);
+                    } catch (NumberFormatException nfe) {
+                        // Se non è un numero, prova il formato data originale
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
+                        Date date2 = sdf.parse(timestampString);
+                        simulatorTime = date2.getTime();
+                    }
+                    long localTime = TimeConversion.getTimeMillis();
 
                     int delay = (int) (localTime - simulatorTime);
                     this.statsManager.onData(delay);

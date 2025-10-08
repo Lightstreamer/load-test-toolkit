@@ -49,12 +49,16 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
         new Field("port",INT,true),
         new Field("adapterSetName",STRING,true),
         new Field("dataAdapterName",STRING,false),
-            new Field("scenarioLKC", STRING, false),
+        new Field("listOfItems", STRING, true),
+        new Field("listOfFields", STRING, true),
+        new Field("subscriptionMode", STRING, true),
+        new Field("unfilteredSubscription",BOOL,false),
         new Field("numberOfSessions",INT,true),
         new Field("itemsPerSession",INT,true),
         new Field("itemRandomExtraction",BOOL,false),
         new Field("firstItemAvailable",INT,false),
         new Field("lastItemAvailable",INT,false),
+        new Field("tsField4Latency",STRING,false),
         new Field("sessionDurationSeconds",INT,false),
         new Field("delaySessionStartMillis",LONG,false),
         new Field("sendBufferSize",STRING,false),
@@ -78,6 +82,9 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
     public int port = -1;
     public String adapterSetName = null; 
     public String dataAdapterName = null; //optional
+    public String listOfItems = null;
+    public String listOfFields = null;
+    public String tsField4Latency = "timestamp"; //optional
 
     public String scenarioLKC = "1";
 

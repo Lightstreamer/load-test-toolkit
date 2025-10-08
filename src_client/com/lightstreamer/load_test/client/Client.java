@@ -97,28 +97,9 @@ public class Client {
         }
         fullConf.generateDataNeededValue();
 
-        _logConf.info("Reading remote configuration...");
+        // Remove remote configuration parameters that are not needed anymore
 
-        FirstClient fc = new FirstClient();
 
-        HashMap<String,String> remoteConf = null;
-        try {
-            remoteConf = /*CAN BLOCK*/ fc.readRemoteConf(fullConf);
-        } catch(Exception e) {
-            exit("Failed reading remote configuration",6,e);
-        }
-        if (remoteConf == null) {
-            exit("Failed reading remote configuration",6,null);
-        }
-        _logConf.debug("Remote configuration: " + remoteConf);
-        
-        //remote conf overrides local conf 
-        //(at the moment nothing is duplicated between the two so that no overriding can happen)
-        try {
-            fullConf.readSeverSentClientConfiguration(remoteConf);
-        } catch(Exception e) {
-            exit("Failed merging configurations",7,e);
-        }
         
         checkConf(fullConf);
         
@@ -144,6 +125,9 @@ public class Client {
     
     
     private static void checkConf(ClientConfiguration fullConf) {
+
+        fullConf.numberOfItems = fullConf.listOfItems.split(",").length;
+
         if (fullConf.lastItemAvailable < fullConf.firstItemAvailable) {
             exit("lastItemAvailable must not be smaller than firstItemAvailable",23,null);
         }
