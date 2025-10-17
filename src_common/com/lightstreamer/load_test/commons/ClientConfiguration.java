@@ -51,6 +51,10 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
         new Field("dataAdapterName",STRING,false),
         new Field("listOfItems", STRING, true),
         new Field("listOfFields", STRING, true),
+        new Field("firstList", STRING, false), // New field for first symbol list
+        new Field("secondList", STRING, false), // New field for second symbol list
+        new Field("enableSymbolListSwitching", BOOL, false), // Enable switching between symbol lists
+        new Field("symbolListSwitchingPeriodMillis", LONG, false), // Period for switching between symbol lists in milliseconds
         new Field("subscriptionMode", STRING, true),
         new Field("unfilteredSubscription",BOOL,false),
         new Field("numberOfSessions",INT,true),
@@ -84,6 +88,10 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
     public String dataAdapterName = null; //optional
     public String listOfItems = null;
     public String listOfFields = null;
+    public String firstList = null; // First symbol list (optional)
+    public String secondList = null; // Second symbol list (optional)
+    public boolean enableSymbolListSwitching = false; // Enable switching between symbol lists (optional)
+    public long symbolListSwitchingPeriodMillis = 15000; // Period for switching between symbol lists in milliseconds (optional, default 15 seconds)
     public String tsField4Latency = "timestamp"; //optional
 
     public String scenarioLKC = "1";

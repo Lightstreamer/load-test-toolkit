@@ -38,6 +38,7 @@ public class Subscription {
     private String buffer;
     private int totalItems;
     private int totalFields;
+    private String subscriptionId; // ID for tracking subscription/unsubscription
     private final Executor executor = Factory.getDefaultFactory().getListenerExecutor();
     
     public Subscription(String mode) {
@@ -68,6 +69,18 @@ public class Subscription {
     
     public String getMode() {
         return mode;
+    }
+    
+    public void setSubscriptionId(String subscriptionId) {
+        synchronized (lock) {
+            this.subscriptionId = subscriptionId;
+        }
+    }
+    
+    public String getSubscriptionId() {
+        synchronized (lock) {
+            return subscriptionId;
+        }
     }
     
     public void setItems(String[] items) {

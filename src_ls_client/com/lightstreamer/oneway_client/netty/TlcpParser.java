@@ -38,6 +38,7 @@ class TlcpParser extends LineAssembler {
         void onCONERR(int code, String error);
         void onLOOP();
         void onSUBOK(String subId, int totalItems, int totalFields);
+        void onUNSUB(String subId);
         void onUpdate(String subId, int item, List<String> values);
         void onREQERR(String reqId, int code, String error);
         void onParseError(Exception e);
@@ -51,8 +52,17 @@ class TlcpParser extends LineAssembler {
     
     @Override
     protected void message(byte[] buf, int count) {
+
+        System.out.println(">>>>>>>>>>>>>>>>>>>>>> count " + count);
+
         try {
-            if (count > 0 && buf[0] == 'U') {
+            if (count > 4 && buf[0] == 'U' && buf[1] == 'N' && buf[2] == 'S' && buf[3] == 'U' && buf[4] == 'B') {
+                // UNSUB,<table>
+                
+                System.out.println(">>>>>>>>>>>>>>>>>>>>>> UNSUB !!!!");
+
+                handler.onUNSUB("");
+            } else if (count > 0 && buf[0] == 'U') {
                 // U,<table>,<item>,<field1>|...|<fieldN>
                 int firstComma = 1;
                 int secondComma = findComma(buf, firstComma + 1);
@@ -71,7 +81,7 @@ class TlcpParser extends LineAssembler {
                 int totalItems = b2int(buf, secondComma + 1, thirdComma);
                 int totalFields = b2int(buf, thirdComma + 1, count);
                 handler.onSUBOK(subId, totalItems, totalFields);
-                
+
             } else if (count > 2 && buf[0] == 'C' && buf[1] == 'O' && buf[2] == 'N') {
                 if (count > 4 && buf[3] == 'O' && buf[4] == 'K') {
                     // CONOK,<session id>,<request limit>,<keep alive>,<control link>

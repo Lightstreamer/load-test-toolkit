@@ -17,6 +17,8 @@ package com.lightstreamer.load_test.client;
 
 
 import java.util.Random;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import org.apache.log4j.Logger;
 
@@ -26,7 +28,6 @@ import com.lightstreamer.load_test.commons.ClientConfiguration;
 import com.lightstreamer.load_test.commons.Constants;
 import com.lightstreamer.oneway_client.LightstreamerClient;
 import com.lightstreamer.oneway_client.Subscription;
-import com.lightstreamer.oneway_client.netty.Factory;
 
 
 /**
@@ -47,6 +48,21 @@ public class SessionsHandler {
     private int numItems;
     private Random random = new Random();
     
+    // Map to track current subscriptions for each session to enable proper unsubscribe
+    private java.util.Map<Integer, Subscription> currentSubscriptions = new java.util.concurrent.ConcurrentHashMap<>();
+    
+    // Symbol lists loaded from configuration (fallback to hard-coded if not configured)
+    private final String[] firstList;
+    private final String[] secondList;
+
+    // private static final String[] FIRST_LIST = {
+    //     "item1", "item3", "item5", "item7", "item9", "item11", "item13", "item15", "item17", "item19"
+    // };
+
+    // private static final String[] SECOND_LIST = {
+    //     "item2", "item4", "item6", "item8", "item10", "item12", "item14", "item16", "item18", "item20"
+    // };
+    
     private static final boolean FAILED_SESSION = true;
     static final boolean FAILED_SUBSCRIPTION = false;
     
@@ -65,6 +81,42 @@ public class SessionsHandler {
       this.lastItem = conf.lastItemAvailable > 0 ? conf.lastItemAvailable : conf.numberOfItems;
       this.firstItem = conf.firstItemAvailable > 0 ? conf.firstItemAvailable : 1;
       this.numItems = this.lastItem - this.firstItem + 1;
+      
+      // Initialize symbol lists from configuration or use defaults
+      if (conf.firstList != null && !conf.firstList.trim().isEmpty()) {
+          this.firstList = conf.firstList.split(",");
+          // Trim whitespace from each item
+          for (int i = 0; i < this.firstList.length; i++) {
+              this.firstList[i] = this.firstList[i].trim();
+          }
+      } else {
+          // Fallback to hard-coded first list
+          this.firstList = new String[]{
+              "1INCHUSD", "APTUSD", "AUDCAD", "AUDNZD", "BTGUSD", "CHFSGD", "CHZUSD", "CRVUSD", 
+              "ENJUSD", "EURAUD", "EURCAD", "EURHKD", "EURHUF", "EURNOK", "EURNZD", "EURSGD", 
+              "EURTRY", "EURZAR", "GBPAUD", "GBPCAD", "GBPNOK", "GBPNZD", "GBPSGD", "GER40Cash", 
+              "GOLD", "IMXUSD", "JP225Cash", "NGASCash", "NZDCAD", "OPUSD", "UK100Cash", 
+              "UNIUSD", "US30Cash", "US500Cash", "USDZAR", "XPTUSD", "ZECUSD"
+          };
+      }
+      
+      if (conf.secondList != null && !conf.secondList.trim().isEmpty()) {
+          this.secondList = conf.secondList.split(",");
+          // Trim whitespace from each item
+          for (int i = 0; i < this.secondList.length; i++) {
+              this.secondList[i] = this.secondList[i].trim();
+          }
+      } else {
+          // Fallback to hard-coded second list
+          this.secondList = new String[]{
+              "EURUSD", "USDJPY", "GBPUSD", "USDCAD", "AUDUSD", "EURJPY", 
+              "GBPJPY", "USDCHF", "EURGBP", "AUDJPY"
+          };
+      }
+      
+      if(_logUpdates.isDebugEnabled()) {
+          _logUpdates.debug("Initialized with firstList: " + this.firstList.length + " items, secondList: " + this.secondList.length + " items");
+      }
     }
     
     
@@ -106,6 +158,7 @@ public class SessionsHandler {
             assert conf.protocol.equalsIgnoreCase("http://") || conf.protocol.equalsIgnoreCase("https://");
             lsClient.connectionOptions.setForcedTransport("HTTP-STREAMING");
         }
+        
         lsClient.addListener(new BaseClientListener() {
             @Override
             public void onServerError(int errorCode, String errorMessage) {
@@ -121,6 +174,13 @@ public class SessionsHandler {
                     if(_logUpdates.isDebugEnabled()) {
                         _logUpdates.debug("Session " + id + " created");
                     }
+                    // Immediately subscribe to first list when connected
+                    subscribeToSymbolList(lsClient, id, true);
+                    
+                    // Setup timer to switch to second list every 15 seconds if enabled by configuration
+                    if (conf.enableSymbolListSwitching) {
+                        setupSymbolListSwitching(lsClient, id);
+                    }
                     break;
                 }
             }
@@ -130,14 +190,71 @@ public class SessionsHandler {
             _logUpdates.debug("Creating session " + id + "...");
         }
         lsClient.connect();
+    }
+    
+    private void subscribeToSymbolList(LightstreamerClient lsClient, int sessionId, boolean useFirstList) {
+        // Choose which symbol list to use from configuration
+        String[] symbolList = useFirstList ? this.firstList : this.secondList;
+        String listName = useFirstList ? "FIRST_LIST" : "SECOND_LIST";
         
-        final Subscription table = configureTable(id);
-        table.addListener(new TableListener(this, id, lsClient, table, statsManager, conf));
+        // Use the symbol names directly from the list without serverId suffix
+        String[] itemNames = symbolList;
+        
+        // Unsubscribe from any existing subscription first
+        Subscription currentSubscription = currentSubscriptions.get(sessionId);
+        if (currentSubscription != null) {
+            if (_logUpdates.isDebugEnabled()) {
+                _logUpdates.debug("Session " + sessionId + " unsubscribing from previous subscription");
+            }
+            try {
+                lsClient.unsubscribe(currentSubscription);
+            } catch (Exception e) {
+                if (_logUpdates.isDebugEnabled()) {
+                    _logUpdates.debug("Error unsubscribing from previous subscription for session " + sessionId, e);
+                }
+            }
+        }
+        
+        Subscription subscription = new Subscription(conf.subscriptionMode);
+        subscription.setFields(conf.listOfFields.split(","));
+        subscription.setDataAdapter(conf.dataAdapterName != null ? conf.dataAdapterName : "DEFAULT");
+        subscription.setItems(itemNames); // Subscribe to ALL items in the list
+        subscription.setRequestedSnapshot("no");
+        
+        if (conf.unfilteredSubscription) {
+            subscription.setRequestedMaxFrequency("unfiltered");
+        }
+        
+        subscription.addListener(new TableListener(this, sessionId, lsClient, subscription, statsManager, conf));
         
         if (_logUpdates.isDebugEnabled()) {
-            _logUpdates.debug("Subscribing to items for session " + id + "("+table.getItemGroup()+")...");
+            _logUpdates.debug("Session " + sessionId + " subscribing to " + listName + " - " + itemNames.length + " items");
         }
-        lsClient.subscribe(table);
+        
+        lsClient.subscribe(subscription);
+        
+        // Store the new subscription for future unsubscribe operations
+        currentSubscriptions.put(sessionId, subscription);
+    }
+    
+    private void setupSymbolListSwitching(final LightstreamerClient lsClient, final int sessionId) {
+        Timer timer = new Timer("SymbolSwitcher-" + sessionId, true);
+        
+        timer.scheduleAtFixedRate(new TimerTask() {
+            private boolean useFirstList = false; // Start with false since we already subscribed to first list
+            
+            @Override
+            public void run() {
+                try {
+                    useFirstList = !useFirstList;
+                    subscribeToSymbolList(lsClient, sessionId, useFirstList);
+                } catch (Exception e) {
+                    if(_logUpdates.isDebugEnabled()) {
+                        _logUpdates.debug("Error switching symbol list for session " + sessionId, e);
+                    }
+                }
+            }
+        }, conf.symbolListSwitchingPeriodMillis, conf.symbolListSwitchingPeriodMillis); // Use configured switching period
     }
     
     

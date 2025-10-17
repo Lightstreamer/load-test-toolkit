@@ -338,6 +338,19 @@ public class ConnectionManager {
     }
     
     /**
+     * Sends unsubscription request.
+     */
+    public void unsubscribe(Connection ch, Subscription sub, Session session) {
+        // For simplicity, we'll implement a basic unsubscribe by sending a delete operation
+        // In a real implementation, you might need to track subscription IDs more carefully
+        String params = "LS_reqId=" + nextReqId.incrementAndGet()
+            + "&LS_op=delete"
+            + "&LS_subId=" + sub.getSubscriptionId() // This might need to be tracked
+            + "&LS_session=" + session.id;
+        ch.sendSubscription(params);
+    }
+    
+    /**
      * Sends message request.
      */
     public void sendMessage(Connection ch, String message, Session session) {
@@ -481,31 +494,43 @@ public class ConnectionManager {
 
         @Override
         public void onCONOK(String sessionId, long reqLimit, long keepalive, String clink) {
+            Logger.log("ONCONOK");
             fail();
         }
 
         @Override
         public void onCONERR(int code, String error) {
+            Logger.log("ONCONERR");
             fail();
         }
 
         @Override
         public void onLOOP() {
+            Logger.log("ONLOOP");
             fail();
         }
         
         @Override
         public void onSUBOK(String subId, int totalItems, int totalFields) {
+            Logger.log("ONSUBOK");
+            fail();
+        }
+
+        @Override
+        public void onUNSUB(String subId) {
+            Logger.log("ONUNSUB");
             fail();
         }
         
         @Override
         public void onUpdate(String subId, int item, List<String> values) {
+            Logger.log("ONUPDATE");
             fail();
         }
         
         @Override
         public void onREQERR(String reqId, int code, String error) {
+            Logger.log("ONREQERR");
             closeAndRelease(ch, chPool);
             session.onSessionError(code, error);
         }
@@ -555,9 +580,9 @@ public class ConnectionManager {
                         Logger.log("Receiving: " + ch + " " + buf.toString(CharsetUtil.US_ASCII));
                     }
                     parser.readBytes(buf);
-                    if (chunk instanceof LastHttpContent) {
-                        chPool.release(ch);
-                    }
+                    // if (chunk instanceof LastHttpContent) {
+                    //     chPool.release(ch);
+                    // }
                     
                 } catch (Throwable e) {
                     closeAndRelease(ch, chPool);
@@ -622,6 +647,11 @@ public class ConnectionManager {
         public void onSUBOK(String subId, int totalItems, int totalFields) {
             session.onSubscription(subId, totalItems, totalFields);
         }
+
+        @Override
+        public void onUNSUB(String subId) {
+            // Not used
+        }
         
         @Override
         public void onUpdate(String subId, int item, List<String> values) {
@@ -663,6 +693,11 @@ public class ConnectionManager {
         @Override
         public void onSUBOK(String subId, int totalItems, int totalFields) {
             session.onSubscription(subId, totalItems, totalFields);
+        }
+
+        @Override
+        public void onUNSUB(String subId) {
+            // Not used
         }
         
         @Override

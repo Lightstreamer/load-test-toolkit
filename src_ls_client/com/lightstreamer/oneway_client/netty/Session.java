@@ -119,8 +119,21 @@ public class Session {
             Stats.subPending.increment();
             subStartTime = System.currentTimeMillis();
             String subId = String.valueOf(nextSubId.incrementAndGet());
+            sub.setSubscriptionId(subId); // Set the subscription ID for later unsubscribe
             subscription = sub;
             connectionManager.subscribe(ch, sub, subId, this);
+        });
+    }
+    
+    /**
+     * Unsubscribes from items.
+     */
+    public void unsubscribe(final Subscription sub) {
+        execWhenReady((Connection ch) -> {
+            if (subscription == sub || subscription != null) {
+                connectionManager.unsubscribe(ch, sub, this);
+                subscription = null; // Clear the current subscription
+            }
         });
     }
     

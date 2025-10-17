@@ -51,6 +51,10 @@ public class LightstreamerClient {
         session.subscribe(sub);
     }
 
+    public void unsubscribe(Subscription sub) {
+        session.unsubscribe(sub);
+    }
+
     public void disconnect() {
         session.disconnect();
     }

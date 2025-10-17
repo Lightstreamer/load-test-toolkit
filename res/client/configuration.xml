@@ -104,5 +104,17 @@
      <!--
      <param name="ignoreData">false</param>
      -->
+     
+     <!-- Advanced symbol list configuration for dynamic subscription switching.
+          firstList and secondList define two separate lists of symbols that sessions can subscribe to.
+          enableSymbolListSwitching controls whether sessions alternate between the two symbol lists.
+          symbolListSwitchingPeriodMillis sets the switching period in milliseconds.
+          When switching is disabled, sessions only use firstList. Default period is 15000ms (15 seconds). -->
+     <!--
+     <param name="firstList">EURUSD,USDJPY,GBPUSD,USDCAD,AUDUSD</param>
+     <param name="secondList">EURJPY,GBPJPY,USDCHF,EURGBP,AUDJPY</param>
+     <param name="enableSymbolListSwitching">false</param>
+     <param name="symbolListSwitchingPeriodMillis">15000</param>
+     -->
     
 </client_conf>
