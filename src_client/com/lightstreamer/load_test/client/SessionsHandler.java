@@ -92,11 +92,7 @@ public class SessionsHandler {
       } else {
           // Fallback to hard-coded first list
           this.firstList = new String[]{
-              "1INCHUSD", "APTUSD", "AUDCAD", "AUDNZD", "BTGUSD", "CHFSGD", "CHZUSD", "CRVUSD", 
-              "ENJUSD", "EURAUD", "EURCAD", "EURHKD", "EURHUF", "EURNOK", "EURNZD", "EURSGD", 
-              "EURTRY", "EURZAR", "GBPAUD", "GBPCAD", "GBPNOK", "GBPNZD", "GBPSGD", "GER40Cash", 
-              "GOLD", "IMXUSD", "JP225Cash", "NGASCash", "NZDCAD", "OPUSD", "UK100Cash", 
-              "UNIUSD", "US30Cash", "US500Cash", "USDZAR", "XPTUSD", "ZECUSD"
+              "item1", "item3", "item5", "item7", "item9", "item11", "item13", "item15", "item17", "item19"
           };
       }
       
@@ -109,8 +105,7 @@ public class SessionsHandler {
       } else {
           // Fallback to hard-coded second list
           this.secondList = new String[]{
-              "EURUSD", "USDJPY", "GBPUSD", "USDCAD", "AUDUSD", "EURJPY", 
-              "GBPJPY", "USDCHF", "EURGBP", "AUDJPY"
+              "item2", "item4", "item6", "item8", "item10", "item12", "item14", "item16", "item18", "item20"
           };
       }
       

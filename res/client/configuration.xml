@@ -111,8 +111,8 @@
           symbolListSwitchingPeriodMillis sets the switching period in milliseconds.
           When switching is disabled, sessions only use firstList. Default period is 15000ms (15 seconds). -->
      <!--
-     <param name="firstList">EURUSD,USDJPY,GBPUSD,USDCAD,AUDUSD</param>
-     <param name="secondList">EURJPY,GBPJPY,USDCHF,EURGBP,AUDJPY</param>
+     <param name="firstList">item1,item3,item4,item5,item7,item9,item11,item13,item15,item17,item19</param>
+     <param name="secondList">item2,item4,item6,item8,item10,item12,item14,item16,item18,item20</param>
      <param name="enableSymbolListSwitching">false</param>
      <param name="symbolListSwitchingPeriodMillis">15000</param>
      -->
