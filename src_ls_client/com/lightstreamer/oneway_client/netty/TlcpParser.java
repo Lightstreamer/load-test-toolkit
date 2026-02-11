@@ -53,13 +53,13 @@ class TlcpParser extends LineAssembler {
     @Override
     protected void message(byte[] buf, int count) {
 
-        System.out.println(">>>>>>>>>>>>>>>>>>>>>> count " + count);
+        // System.out.println(">>>>>>>>>>>>>>>>>>>>>> count " + count);
 
         try {
             if (count > 4 && buf[0] == 'U' && buf[1] == 'N' && buf[2] == 'S' && buf[3] == 'U' && buf[4] == 'B') {
                 // UNSUB,<table>
                 
-                System.out.println(">>>>>>>>>>>>>>>>>>>>>> UNSUB !!!!");
+                // System.out.println(">>>>>>>>>>>>>>>>>>>>>> UNSUB !!!!");
 
                 handler.onUNSUB("");
             } else if (count > 0 && buf[0] == 'U') {
