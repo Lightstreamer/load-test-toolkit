@@ -17,8 +17,11 @@ package com.lightstreamer.load_test.client;
 
 
 import java.util.Random;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.log4j.Logger;
 
@@ -49,20 +52,26 @@ public class SessionsHandler {
     private Random random = new Random();
     
     // Map to track current subscriptions for each session to enable proper unsubscribe
-    private java.util.Map<Integer, Subscription> currentSubscriptions = new java.util.concurrent.ConcurrentHashMap<>();
+    private java.util.Map<Integer, Subscription> currentSubscriptions = new ConcurrentHashMap<>();
+    
+    // Shared scheduler for all sessions (uses 4 threads instead of N threads for N sessions)
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(4, r -> {
+        Thread t = new Thread(r);
+        t.setDaemon(true);
+        t.setName("SymbolSwitcher-Pool-" + t.getId());
+        return t;
+    });
+    
+    // Map to track scheduled tasks for cleanup
+    private final java.util.Map<Integer, ScheduledFuture<?>> scheduledTasks = new ConcurrentHashMap<>();
     
     // Symbol lists loaded from configuration (fallback to hard-coded if not configured)
     private final String[] firstList;
     private final String[] secondList;
-
-    // private static final String[] FIRST_LIST = {
-    //     "item1", "item3", "item5", "item7", "item9", "item11", "item13", "item15", "item17", "item19"
-    // };
-
-    // private static final String[] SECOND_LIST = {
-    //     "item2", "item4", "item6", "item8", "item10", "item12", "item14", "item16", "item18", "item20"
-    // };
     
+    // Pre-split fields array to avoid repeated splitting (SOLUTION 3 optimization)
+    private final String[] fieldsArray;
+
     private static final boolean FAILED_SESSION = true;
     static final boolean FAILED_SUBSCRIPTION = false;
     
@@ -112,6 +121,9 @@ public class SessionsHandler {
       if(_logUpdates.isDebugEnabled()) {
           _logUpdates.debug("Initialized with firstList: " + this.firstList.length + " items, secondList: " + this.secondList.length + " items");
       }
+      
+      // Pre-split fields array once to avoid repeated splitting (memory optimization)
+      this.fieldsArray = conf.listOfFields.split(",");
     }
     
     
@@ -125,10 +137,26 @@ public class SessionsHandler {
 
         Utils.sleep(conf.sessionDurationSeconds * 1000);
         batchLogger.flush();
+        
+        // Shutdown the scheduler gracefully
+        _logUpdates.info("Shutting down symbol switching scheduler...");
+        scheduler.shutdown();
+        try {
+            if (!scheduler.awaitTermination(5, TimeUnit.SECONDS)) {
+                scheduler.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            scheduler.shutdownNow();
+            Thread.currentThread().interrupt();
+        }
+        
         _logUpdates.info("All sessions terminated. Exiting...");
     }
     
     void abortSession(int id,LightstreamerClient lsClient, Exception e, boolean whatFailed) {
+        // Cleanup session resources
+        cleanupSession(id);
+        
         lsClient.disconnect();
         if (whatFailed == FAILED_SESSION) {
             if(_logUpdates.isDebugEnabled()) {
@@ -169,12 +197,13 @@ public class SessionsHandler {
                     if(_logUpdates.isDebugEnabled()) {
                         _logUpdates.debug("Session " + id + " created");
                     }
-                    // Immediately subscribe to first list when connected
-                    subscribeToSymbolList(lsClient, id, true);
                     
                     // Setup timer to switch to second list every 15 seconds if enabled by configuration
                     if (conf.enableSymbolListSwitching) {
                         setupSymbolListSwitching(lsClient, id);
+                    } else {
+                        // Subscribe to symbol list immediately if switching is not enabled
+                        subscribeToSymbolList(lsClient, id, true);
                     }
                     break;
                 }
@@ -192,8 +221,25 @@ public class SessionsHandler {
         String[] symbolList = useFirstList ? this.firstList : this.secondList;
         String listName = useFirstList ? "FIRST_LIST" : "SECOND_LIST";
         
-        // Use the symbol names directly from the list without serverId suffix
-        String[] itemNames = symbolList;
+        // Select randomly conf.itemsPerSession items from the symbol list
+        int itemsToSelect = Math.min(conf.itemsPerSession, symbolList.length);
+        String[] itemNames = new String[itemsToSelect];
+        
+        // Create a copy of the array to shuffle without modifying the original
+        String[] shuffledSymbols = symbolList.clone();
+        
+        // Shuffle using Fisher-Yates algorithm
+        for (int i = shuffledSymbols.length - 1; i > 0; i--) {
+            int j = random.nextInt(i + 1);
+            String temp = shuffledSymbols[i];
+            shuffledSymbols[i] = shuffledSymbols[j];
+            shuffledSymbols[j] = temp;
+        }
+        
+        // Take the first itemsToSelect elements from the shuffled array
+        for (int i = 0; i < itemsToSelect; i++) {
+            itemNames[i] = shuffledSymbols[i];
+        }
         
         // Unsubscribe from any existing subscription first
         Subscription currentSubscription = currentSubscriptions.get(sessionId);
@@ -211,7 +257,7 @@ public class SessionsHandler {
         }
         
         Subscription subscription = new Subscription(conf.subscriptionMode);
-        subscription.setFields(conf.listOfFields.split(","));
+        subscription.setFields(fieldsArray); // Use pre-split array
         subscription.setDataAdapter(conf.dataAdapterName != null ? conf.dataAdapterName : "DEFAULT");
         subscription.setItems(itemNames); // Subscribe to ALL items in the list
         subscription.setRequestedSnapshot("no");
@@ -222,9 +268,7 @@ public class SessionsHandler {
         
         subscription.addListener(new TableListener(this, sessionId, lsClient, subscription, statsManager, conf));
         
-        if (_logUpdates.isDebugEnabled()) {
-            _logUpdates.debug("Session " + sessionId + " subscribing to " + listName + " - " + itemNames.length + " items");
-        }
+        _logUpdates.info("Session " + sessionId + " subscribing to " + listName + " - " + itemNames.length + " items");
         
         lsClient.subscribe(subscription);
         
@@ -233,14 +277,15 @@ public class SessionsHandler {
     }
     
     private void setupSymbolListSwitching(final LightstreamerClient lsClient, final int sessionId) {
-        Timer timer = new Timer("SymbolSwitcher-" + sessionId, true);
-        
-        timer.scheduleAtFixedRate(new TimerTask() {
+        // Use shared scheduler instead of individual Timer per session
+        // This reduces memory footprint from N threads to 4 threads for all sessions
+        ScheduledFuture<?> scheduledTask = scheduler.scheduleAtFixedRate(new Runnable() {
             private boolean useFirstList = false; // Start with false since we already subscribed to first list
             
             @Override
             public void run() {
                 try {
+                    _logUpdates.debug("Time to switch for session: " + sessionId);
                     useFirstList = !useFirstList;
                     subscribeToSymbolList(lsClient, sessionId, useFirstList);
                 } catch (Exception e) {
@@ -249,7 +294,28 @@ public class SessionsHandler {
                     }
                 }
             }
-        }, conf.symbolListSwitchingPeriodMillis, conf.symbolListSwitchingPeriodMillis); // Use configured switching period
+        }, conf.delaySessionStartMillis, conf.symbolListSwitchingPeriodMillis, TimeUnit.MILLISECONDS);
+        
+        // Store the scheduled task for cleanup
+        scheduledTasks.put(sessionId, scheduledTask);
+    }
+    
+    /**
+     * Cleanup session resources: cancel scheduled tasks and remove subscriptions.
+     * This prevents memory leaks when sessions terminate or fail.
+     */
+    private void cleanupSession(int sessionId) {
+        // Cancel the scheduled symbol switching task
+        ScheduledFuture<?> task = scheduledTasks.remove(sessionId);
+        if (task != null) {
+            task.cancel(false);
+            if(_logUpdates.isDebugEnabled()) {
+                _logUpdates.debug("Cancelled symbol switching task for session " + sessionId);
+            }
+        }
+        
+        // Remove subscription reference
+        currentSubscriptions.remove(sessionId);
     }
     
     
