@@ -37,9 +37,7 @@
     <param name="itemsPerSession">4</param>
 	
 	<param name="dataAdapterName">QUOTE_ADAPTER</param>
-	
-	<param name="listOfItems">item1,item2,item3,item4,item4,item6,item7,item8,item9,item10,item11,item12,item13,item14,item15,item16</param>
-	
+
 	<!-- Advanced symbol list configuration for dynamic subscription switching.
           firstList and secondList define two separate lists of symbols that sessions can subscribe to.
           enableSymbolListSwitching controls whether sessions alternate between the two symbol lists.
@@ -51,6 +49,24 @@
     <param name="symbolListSwitchingPeriodMillis">30000</param>
 	
 	<param name="listOfFields">stock_name,last_price,bid,ask,time</param>
+
+     <!-- Name of the field provided by the server that carries the timestamp used to compute latency.
+          The field value is compared against the local time at the moment the update is received.
+          Default is "timestamp". -->
+     <!--
+     <param name="tsField4Latency">timestamp</param>
+     -->
+
+     <!-- Format used to parse the timestamp field value when it contains a human-readable date/time string.
+          The pattern follows java.time.format.DateTimeFormatter conventions.
+          Examples:
+            "yyyy-MM-dd HH:mm:ss.SSS"  for values like "2026-02-26 09:48:56.123"
+            "HH:mm:ss"                 for values like "09:48:56" (date is assumed to be today)
+          If this parameter is omitted, the field value is expected to be a numeric epoch timestamp
+          in milliseconds (i.e. the output of System.currentTimeMillis()). -->
+     <!--
+     <param name="tsDateFormat">yyyy-MM-dd HH:mm:ss.SSS</param>
+     -->
 	
 	<param name="subscriptionMode">MERGE</param>
     

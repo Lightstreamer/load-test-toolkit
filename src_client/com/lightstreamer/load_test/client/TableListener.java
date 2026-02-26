@@ -15,9 +15,12 @@
 
 package com.lightstreamer.load_test.client;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Map.Entry;
 
 import org.apache.log4j.Logger;
@@ -66,6 +69,8 @@ class TableListener extends BaseSubscriptionListener {
     private StatisticsManager statsManager;
     private ClientConfiguration conf;
     private String timestamp_field;
+    /** Pre-compiled date formatter for non-epoch timestamps; null means only epoch ms is accepted. */
+    private final DateTimeFormatter dateFormatter;
     private int sessionId = 0;
     StringBuffer update;
 
@@ -84,6 +89,9 @@ class TableListener extends BaseSubscriptionListener {
         }
 
         this.timestamp_field = conf.tsField4Latency;
+        this.dateFormatter = (conf.tsDateFormat != null && !conf.tsDateFormat.isEmpty())
+                ? DateTimeFormatter.ofPattern(conf.tsDateFormat)
+                : null;
     }
 
     @Override
@@ -132,7 +140,7 @@ class TableListener extends BaseSubscriptionListener {
             try {            
                 String timestampString = values.getValue(timestamp_field);
 
-                _logLatencies.debug("Timestamp: " + timestampString);
+                _logLatencies.debug("Raw field for latency as configured: " + timestampString);
 
                 try {
                     // Se il timestamp è nel formato "timestamp=1759747213345", estraiamo solo la parte numerica
@@ -140,14 +148,27 @@ class TableListener extends BaseSubscriptionListener {
                         timestampString = timestampString.split("=")[1];
                     }
                     
-                    // Prova prima a parsare come timestamp epoch (millisecondi)
-                    try {
+                    // Parse according to configuration:
+                    // - if tsDateFormat is set, use DateTimeFormatter directly
+                    //   - try LocalDateTime first (full date+time formats)
+                    //   - fall back to LocalTime combined with today's date (time-only formats like HH:mm:ss)
+                    // - otherwise assume the value is an epoch timestamp (milliseconds)
+                    if (dateFormatter != null) {
+                        try {
+                            simulatorTime = LocalDateTime.parse(timestampString, dateFormatter)
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant()
+                                    .toEpochMilli();
+                        } catch (DateTimeParseException dtpe) {
+                            // Time-only format: combine with today's date
+                            simulatorTime = LocalTime.parse(timestampString, dateFormatter)
+                                    .atDate(LocalDate.now())
+                                    .atZone(ZoneId.systemDefault())
+                                    .toInstant()
+                                    .toEpochMilli();
+                        }
+                    } else {
                         simulatorTime = Long.parseLong(timestampString);
-                    } catch (NumberFormatException nfe) {
-                        // Se non è un numero, prova il formato data originale
-                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS");
-                        Date date2 = sdf.parse(timestampString);
-                        simulatorTime = date2.getTime();
                     }
                     long localTime = TimeConversion.getTimeMillis();
 
@@ -180,7 +201,7 @@ class TableListener extends BaseSubscriptionListener {
                         }
 
                     }
-                } catch (ParseException e) {
+                } catch (DateTimeParseException e) {
                     e.printStackTrace();
                 }
             } catch (NumberFormatException nfe) {

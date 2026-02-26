@@ -63,6 +63,7 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
         new Field("firstItemAvailable",INT,false),
         new Field("lastItemAvailable",INT,false),
         new Field("tsField4Latency",STRING,false),
+        new Field("tsDateFormat",STRING,false),
         new Field("sessionDurationSeconds",INT,false),
         new Field("delaySessionStartMillis",LONG,false),
         new Field("sendBufferSize",STRING,false),
@@ -93,6 +94,7 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
     public boolean enableSymbolListSwitching = false; // Enable switching between symbol lists (optional)
     public long symbolListSwitchingPeriodMillis = 15000; // Period for switching between symbol lists in milliseconds (optional, default 15 seconds)
     public String tsField4Latency = "timestamp"; //optional
+    public String tsDateFormat = null; //optional, if set enables date string parsing (e.g. "yyyy-MM-dd HH:mm:ss.SSS"); if null, epoch ms (long) is assumed
 
     public String scenarioLKC = "1";
 
