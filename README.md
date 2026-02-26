@@ -47,3 +47,42 @@ This version introduces several new configuration parameters for enhanced symbol
 ```
 
 This configuration will make sessions initially subscribe to the first list (EURUSD, USDJPY, etc.), then switch to the second list (EURJPY, GBPJPY, etc.) every 30 seconds, alternating continuously between the two lists.
+
+### Latency Measurement Configuration
+
+The client can measure end-to-end latency by comparing a timestamp embedded in each server update against the local time at the moment the update is received.
+
+* **`tsField4Latency`** - Name of the field in the server update that carries the timestamp
+  - Default: `timestamp`
+  - The field must be included in `listOfFields` (or sent automatically by the adapter)
+  - The client looks for this field in every received update and uses its value to compute the latency
+
+* **`tsDateFormat`** - Pattern used to parse the timestamp field when it contains a human-readable date/time string
+  - Follows [`java.time.format.DateTimeFormatter`](https://docs.oracle.com/en/java/docs/api/java.base/java/time/format/DateTimeFormatter.html) conventions
+  - If **omitted**, the field value is expected to be a numeric epoch timestamp in milliseconds (i.e. the output of `System.currentTimeMillis()`)
+  - If the pattern contains only a time component (no date), the current date is assumed
+
+  | Timestamp value example | `tsDateFormat` value |
+  |---|---|
+  | `1759747213345` | *(omit parameter — epoch ms assumed)* |
+  | `2026-02-26 09:48:56.123` | `yyyy-MM-dd HH:mm:ss.SSS` |
+  | `09:48:56` | `HH:mm:ss` |
+
+  The field value may also arrive in the form `fieldname=value` (e.g. `timestamp=1759747213345`); in that case the client automatically strips the prefix before parsing.
+
+#### Configuration Examples
+
+```xml
+<!-- Use the field "time" as latency source, formatted as a time-only string -->
+<param name="tsField4Latency">time</param>
+<param name="tsDateFormat">HH:mm:ss</param>
+```
+
+```xml
+<!-- Use the field "timestamp" carrying an epoch ms value (default behaviour) -->
+<param name="tsField4Latency">timestamp</param>
+<!-- tsDateFormat omitted: epoch ms assumed -->
+```
+
+> **Note:** Latency reporting is only active when the logger `com.lightstreamer.load_test.reports.latency_reporting` is set to `INFO` level or finer in `log_conf.xml`. When this logger is disabled, the timestamp field is not read and the data can be fully ignored for better performance.
+
