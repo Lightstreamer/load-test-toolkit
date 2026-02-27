@@ -327,7 +327,8 @@ public class SessionsHandler {
 
         // Choose numbers of items to subscribe depending on configuration 
         // choose randomly numberOfItems from the list of available items without repetitions
-        String[] availableItems = conf.listOfItems.split(",");
+        // Use firstList as the base item source (listOfItems is no longer used)
+        String[] availableItems = this.firstList;
 
         // Make sure we don't request more items than available
         int itemsToSelect = Math.min(conf.itemsPerSession, availableItems.length);

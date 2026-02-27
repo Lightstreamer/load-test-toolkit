@@ -67,27 +67,27 @@ ClientSimulator\start_client.bat
 
 ## New Configuration Parameters
 
-This version introduces several new configuration parameters for enhanced symbol list management and dynamic subscription switching:
+This version introduces several new configuration parameters for enhanced item list management and dynamic subscription switching:
 
-### Symbol List Configuration
+### Item List Configuration
 
-* **`firstList`** - Comma-separated list of symbols for the first subscription group
+* **`firstList`** - Comma-separated list of items for the first subscription group
   - Example: `item2,item5,item12,item19,item21,item29`
-  - These symbols will be used when sessions initially connect or when switching back from the second list
+  - These items will be used when sessions initially connect or when switching back from the second list
 
-* **`secondList`** - Comma-separated list of symbols for the second subscription group  
+* **`secondList`** - Comma-separated list of items for the second subscription group  
   - Example: `item17,item15,item20,item25,item27`
-  - These symbols will be used when sessions switch from the first list
+  - These items will be used when sessions switch from the first list
 
 ### Dynamic Subscription Switching
 
-* **`enableSymbolListSwitching`** - Enable/disable automatic switching between symbol lists
+* **`enableSymbolListSwitching`** - Enable/disable automatic switching between item lists
   - Values: `true` or `false`
   - Default: `false`
   - When enabled, sessions will periodically switch between `firstList` and `secondList`
   - When disabled, sessions will only subscribe to `firstList`
 
-* **`symbolListSwitchingPeriodMillis`** - Time interval for switching between symbol lists
+* **`symbolListSwitchingPeriodMillis`** - Time interval for switching between item lists
   - Values: Any positive integer (milliseconds)
   - Default: `15000` (15 seconds)
   - Example: `30000` for 30-second switching intervals

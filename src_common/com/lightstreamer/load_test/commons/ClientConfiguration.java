@@ -49,7 +49,7 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
         new Field("port",INT,true),
         new Field("adapterSetName",STRING,true),
         new Field("dataAdapterName",STRING,false),
-        new Field("listOfItems", STRING, true),
+        new Field("listOfItems", STRING, false),
         new Field("listOfFields", STRING, true),
         new Field("firstList", STRING, false), // New field for first symbol list
         new Field("secondList", STRING, false), // New field for second symbol list

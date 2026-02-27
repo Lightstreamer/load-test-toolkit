@@ -126,7 +126,9 @@ public class Client {
     
     private static void checkConf(ClientConfiguration fullConf) {
 
-        fullConf.numberOfItems = fullConf.listOfItems.split(",").length;
+        // numberOfItems is derived from firstList (listOfItems is no longer used)
+        String itemSource = fullConf.firstList != null ? fullConf.firstList : "";
+        fullConf.numberOfItems = itemSource.isEmpty() ? 0 : itemSource.split(",").length;
 
         if (fullConf.lastItemAvailable < fullConf.firstItemAvailable) {
             exit("lastItemAvailable must not be smaller than firstItemAvailable",23,null);

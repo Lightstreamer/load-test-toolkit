@@ -47,7 +47,7 @@
     <param name="enableSymbolListSwitching">false</param>
     <param name="symbolListSwitchingPeriodMillis">30000</param>
 
-    <param name="listOfFields">stock_name,last_price,bid,ask,time</param>
+    <param name="listOfFields">timestamp,stock_name,last_price,bid,ask,time</param>
 
     <!-- Name of the field provided by the server that carries the timestamp used to compute latency.
          The field value is compared against the local time at the moment the update is received.
