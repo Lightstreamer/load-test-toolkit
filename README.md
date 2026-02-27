@@ -49,7 +49,7 @@ Copy the `configuration.xml` template from this branch into the `ClientSimulator
 res/client/configuration.xml  →  ClientSimulator/configuration.xml
 ```
 
-Then edit `ClientSimulator/configuration.xml` to match your environment — at minimum set the correct `protocol`, `host`, `port`, `adapterSetName`, `listOfItems`, `listOfFields`, and `subscriptionMode`. Refer to the parameter descriptions below for all available options.
+Then edit `ClientSimulator/configuration.xml` to match your environment — at minimum set the correct `protocol`, `host`, `port`, `adapterSetName`, `firstList`, `secondList`, `listOfFields`, and `subscriptionMode`. Refer to the parameter descriptions below for all available options.
 
 ### 5. Run the Simulator
 
