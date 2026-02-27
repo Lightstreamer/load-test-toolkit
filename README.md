@@ -9,6 +9,62 @@ For a general overview of the Load Test Toolkit and its complete functionality, 
 #### This branch contains a modified version of the *ClientSimulator* that can operate without the corresponding adapter-side component of LLTT.
 The client configuration has been extended to allow specifying a custom Adapter Set and Data Adapter to connect to, as well as defining parameters for session subscription settings.
 
+## How to Use the ClientSimulator Without the LLTT Adapter
+
+This branch allows you to run the ClientSimulator against **any existing Lightstreamer adapter**, without deploying the server-side components of LLTT. Follow the steps below to set it up.
+
+### 1. Build the Project
+
+Clone this branch and build the project using Maven:
+
+```bash
+mvn clean package
+```
+
+This will compile the sources and produce the JAR file under the `target/` directory:
+
+```
+target/load-test-toolkit-4.0.0.jar
+```
+
+### 2. Get the LLTT Distribution Package
+
+Download the latest release of the Load Test Toolkit from the [Releases page](../../releases) and extract the `LLTT.zip` archive. Inside you will find the `ClientSimulator/` folder, which contains the launcher scripts and a `lib/` subfolder with the runtime dependencies.
+
+### 3. Replace the JAR
+
+Copy the JAR built in step 1 into the `lib/` folder of the extracted package, replacing the existing one:
+
+```
+ClientSimulator/
+└── lib/
+    └── load-test-toolkit-4.0.0.jar   ← replace with the one from target/
+```
+
+### 4. Configure the Client
+
+Copy the `configuration.xml` template from this branch into the `ClientSimulator/` folder:
+
+```
+res/client/configuration.xml  →  ClientSimulator/configuration.xml
+```
+
+Then edit `ClientSimulator/configuration.xml` to match your environment — at minimum set the correct `protocol`, `host`, `port`, `adapterSetName`, `listOfItems`, `listOfFields`, and `subscriptionMode`. Refer to the parameter descriptions below for all available options.
+
+### 5. Run the Simulator
+
+Launch the simulator using the provided script:
+
+```bash
+# Linux / macOS
+./ClientSimulator/start_client.sh
+
+# Windows
+ClientSimulator\start_client.bat
+```
+
+---
+
 ## New Configuration Parameters
 
 This version introduces several new configuration parameters for enhanced symbol list management and dynamic subscription switching:
