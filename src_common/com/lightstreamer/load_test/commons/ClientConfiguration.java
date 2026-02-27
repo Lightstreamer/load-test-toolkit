@@ -53,8 +53,8 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
         new Field("listOfFields", STRING, true),
         new Field("firstList", STRING, false), // New field for first symbol list
         new Field("secondList", STRING, false), // New field for second symbol list
-        new Field("enableSymbolListSwitching", BOOL, false), // Enable switching between symbol lists
-        new Field("symbolListSwitchingPeriodMillis", LONG, false), // Period for switching between symbol lists in milliseconds
+        new Field("enableItemListSwitching", BOOL, false), // Enable switching between item lists
+        new Field("itemListSwitchingPeriodMillis", LONG, false), // Period for switching between item lists in milliseconds
         new Field("subscriptionMode", STRING, true),
         new Field("unfilteredSubscription",BOOL,false),
         new Field("numberOfSessions",INT,true),
@@ -91,8 +91,8 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
     public String listOfFields = null;
     public String firstList = null; // First symbol list (optional)
     public String secondList = null; // Second symbol list (optional)
-    public boolean enableSymbolListSwitching = false; // Enable switching between symbol lists (optional)
-    public long symbolListSwitchingPeriodMillis = 15000; // Period for switching between symbol lists in milliseconds (optional, default 15 seconds)
+    public boolean enableItemListSwitching = false; // Enable switching between item lists (optional)
+    public long itemListSwitchingPeriodMillis = 15000; // Period for switching between item lists in milliseconds (optional, default 15 seconds)
     public String tsField4Latency = "timestamp"; //optional
     public String tsDateFormat = null; //optional, if set enables date string parsing (e.g. "yyyy-MM-dd HH:mm:ss.SSS"); if null, epoch ms (long) is assumed
 

@@ -199,7 +199,7 @@ public class SessionsHandler {
                     }
                     
                     // Setup timer to switch to second list every 15 seconds if enabled by configuration
-                    if (conf.enableSymbolListSwitching) {
+                    if (conf.enableItemListSwitching) {
                         setupSymbolListSwitching(lsClient, id);
                     } else {
                         // Subscribe to symbol list immediately if switching is not enabled
@@ -294,7 +294,7 @@ public class SessionsHandler {
                     }
                 }
             }
-        }, conf.delaySessionStartMillis, conf.symbolListSwitchingPeriodMillis, TimeUnit.MILLISECONDS);
+        }, conf.delaySessionStartMillis, conf.itemListSwitchingPeriodMillis, TimeUnit.MILLISECONDS);
         
         // Store the scheduled task for cleanup
         scheduledTasks.put(sessionId, scheduledTask);

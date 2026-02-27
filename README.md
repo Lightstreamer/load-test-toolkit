@@ -81,25 +81,25 @@ This version introduces several new configuration parameters for enhanced item l
 
 ### Dynamic Subscription Switching
 
-* **`enableSymbolListSwitching`** - Enable/disable automatic switching between item lists
+* **`enableItemListSwitching`** - Enable/disable automatic switching between item lists
   - Values: `true` or `false`
   - Default: `false`
   - When enabled, sessions will periodically switch between `firstList` and `secondList`
   - When disabled, sessions will only subscribe to `firstList`
 
-* **`symbolListSwitchingPeriodMillis`** - Time interval for switching between item lists
+* **`itemListSwitchingPeriodMillis`** - Time interval for switching between item lists
   - Values: Any positive integer (milliseconds)
   - Default: `15000` (15 seconds)
   - Example: `30000` for 30-second switching intervals
-  - Only applies when `enableSymbolListSwitching` is `true`
+  - Only applies when `enableItemListSwitching` is `true`
 
 ### Configuration Example
 
 ```xml
 <param name="firstList">EURUSD,USDJPY,GBPUSD,USDCAD,AUDUSD</param>
 <param name="secondList">EURJPY,GBPJPY,USDCHF,EURGBP,AUDJPY</param>
-<param name="enableSymbolListSwitching">true</param>
-<param name="symbolListSwitchingPeriodMillis">30000</param>
+<param name="enableItemListSwitching">true</param>
+<param name="itemListSwitchingPeriodMillis">30000</param>
 ```
 
 This configuration will make sessions initially subscribe to the first list (EURUSD, USDJPY, etc.), then switch to the second list (EURJPY, GBPJPY, etc.) every 30 seconds, alternating continuously between the two lists.
