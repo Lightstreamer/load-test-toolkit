@@ -126,6 +126,19 @@ The client can measure end-to-end latency by comparing a timestamp embedded in e
 
   The field value may also arrive in the form `fieldname=value` (e.g. `timestamp=1759747213345`); in that case the client automatically strips the prefix before parsing.
 
+#### Protobuf `google.protobuf.Timestamp` Support
+
+If the server-side adapter maps a Protobuf `google.protobuf.Timestamp` field into two separate Lightstreamer fields (one for the epoch seconds and one for the sub-second nanoseconds), the client can compute latency directly from those two fields instead of using `tsField4Latency` / `tsDateFormat`.
+
+* **`tsSecondsField`** - Name of the field carrying the `seconds` component of the Protobuf Timestamp
+* **`tsNanosField`** - Name of the field carrying the `nanos` component of the Protobuf Timestamp
+
+When **both** parameters are set, the latency is computed as:
+
+$$\text{delay} = \text{currentTimeMillis()} - \left(\text{seconds} \times 1000 + \left\lfloor \frac{\text{nanos}}{1\,000\,000} \right\rfloor\right)$$
+
+When these parameters are set, `tsField4Latency` and `tsDateFormat` are ignored. Both fields must be included in `listOfFields`.
+
 #### Configuration Examples
 
 ```xml
@@ -138,6 +151,12 @@ The client can measure end-to-end latency by comparing a timestamp embedded in e
 <!-- Use the field "timestamp" carrying an epoch ms value (default behaviour) -->
 <param name="tsField4Latency">timestamp</param>
 <!-- tsDateFormat omitted: epoch ms assumed -->
+```
+
+```xml
+<!-- Protobuf Timestamp: adapter maps tick_time into two fields -->
+<param name="tsSecondsField">tick_time_seconds</param>
+<param name="tsNanosField">tick_time_nanos</param>
 ```
 
 > **Note:** Latency reporting is only active when the logger `com.lightstreamer.load_test.reports.latency_reporting` is set to `INFO` level or finer in `log_conf.xml`. When this logger is disabled, the timestamp field is not read and the data can be fully ignored for better performance.

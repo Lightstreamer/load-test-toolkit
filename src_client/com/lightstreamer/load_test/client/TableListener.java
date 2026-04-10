@@ -71,6 +71,9 @@ class TableListener extends BaseSubscriptionListener {
     private String timestamp_field;
     /** Pre-compiled date formatter for non-epoch timestamps; null means only epoch ms is accepted. */
     private final DateTimeFormatter dateFormatter;
+    /** Field names for protobuf google.protobuf.Timestamp (seconds + nanos); null when not configured. */
+    private final String tsSecondsField;
+    private final String tsNanosField;
     private int sessionId = 0;
     StringBuffer update;
 
@@ -92,6 +95,8 @@ class TableListener extends BaseSubscriptionListener {
         this.dateFormatter = (conf.tsDateFormat != null && !conf.tsDateFormat.isEmpty())
                 ? DateTimeFormatter.ofPattern(conf.tsDateFormat)
                 : null;
+        this.tsSecondsField = conf.tsSecondsField;
+        this.tsNanosField = conf.tsNanosField;
     }
 
     @Override
@@ -138,37 +143,50 @@ class TableListener extends BaseSubscriptionListener {
         if (statsManager != null) {
             long simulatorTime=0;
             try {            
-                String timestampString = values.getValue(timestamp_field);
-
-                _logLatencies.debug("Raw field for latency as configured: " + timestampString);
-
                 try {
-                    // Se il timestamp è nel formato "timestamp=1759747213345", estraiamo solo la parte numerica
-                    if (timestampString != null && timestampString.contains("=")) {
-                        timestampString = timestampString.split("=")[1];
-                    }
-                    
-                    // Parse according to configuration:
-                    // - if tsDateFormat is set, use DateTimeFormatter directly
-                    //   - try LocalDateTime first (full date+time formats)
-                    //   - fall back to LocalTime combined with today's date (time-only formats like HH:mm:ss)
-                    // - otherwise assume the value is an epoch timestamp (milliseconds)
-                    if (dateFormatter != null) {
-                        try {
-                            simulatorTime = LocalDateTime.parse(timestampString, dateFormatter)
-                                    .atZone(ZoneId.systemDefault())
-                                    .toInstant()
-                                    .toEpochMilli();
-                        } catch (DateTimeParseException dtpe) {
-                            // Time-only format: combine with today's date
-                            simulatorTime = LocalTime.parse(timestampString, dateFormatter)
-                                    .atDate(LocalDate.now())
-                                    .atZone(ZoneId.systemDefault())
-                                    .toInstant()
-                                    .toEpochMilli();
-                        }
+                    // Protobuf Timestamp mode: two separate fields (seconds + nanos)
+                    if (tsSecondsField != null && tsNanosField != null) {
+                        String secondsStr = values.getValue(tsSecondsField);
+                        String nanosStr = values.getValue(tsNanosField);
+
+                        _logLatencies.debug("Raw protobuf Timestamp fields: seconds=" + secondsStr + ", nanos=" + nanosStr);
+
+                        long seconds = Long.parseLong(secondsStr);
+                        long nanos = Long.parseLong(nanosStr);
+                        simulatorTime = seconds * 1000 + nanos / 1_000_000;
                     } else {
-                        simulatorTime = Long.parseLong(timestampString);
+                        // Single-field mode
+                        String timestampString = values.getValue(timestamp_field);
+
+                        _logLatencies.debug("Raw field for latency as configured: " + timestampString);
+
+                        // Se il timestamp è nel formato "timestamp=1759747213345", estraiamo solo la parte numerica
+                        if (timestampString != null && timestampString.contains("=")) {
+                            timestampString = timestampString.split("=")[1];
+                        }
+                    
+                        // Parse according to configuration:
+                        // - if tsDateFormat is set, use DateTimeFormatter directly
+                        //   - try LocalDateTime first (full date+time formats)
+                        //   - fall back to LocalTime combined with today's date (time-only formats like HH:mm:ss)
+                        // - otherwise assume the value is an epoch timestamp (milliseconds)
+                        if (dateFormatter != null) {
+                            try {
+                                simulatorTime = LocalDateTime.parse(timestampString, dateFormatter)
+                                        .atZone(ZoneId.systemDefault())
+                                        .toInstant()
+                                        .toEpochMilli();
+                            } catch (DateTimeParseException dtpe) {
+                                // Time-only format: combine with today's date
+                                simulatorTime = LocalTime.parse(timestampString, dateFormatter)
+                                        .atDate(LocalDate.now())
+                                        .atZone(ZoneId.systemDefault())
+                                        .toInstant()
+                                        .toEpochMilli();
+                            }
+                        } else {
+                            simulatorTime = Long.parseLong(timestampString);
+                        }
                     }
                     long localTime = TimeConversion.getTimeMillis();
 

@@ -67,6 +67,17 @@
     <param name="tsDateFormat">yyyy-MM-dd HH:mm:ss.SSS</param>
     -->
 
+    <!-- Protobuf google.protobuf.Timestamp support.
+         When both tsSecondsField and tsNanosField are set, the latency is computed
+         from two separate fields carrying the epoch seconds and the sub-second nanoseconds
+         of a google.protobuf.Timestamp.
+         Latency (ms) = currentTimeMillis() - (seconds * 1000 + nanos / 1_000_000)
+         When these params are set, tsField4Latency and tsDateFormat are ignored. -->
+    <!--
+    <param name="tsSecondsField">tick_time_seconds</param>
+    <param name="tsNanosField">tick_time_nanos</param>
+    -->
+
     <param name="subscriptionMode">MERGE</param>
 
     <!-- If true, the items subscribed to by each session are chosen randomly;
