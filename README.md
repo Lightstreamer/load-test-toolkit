@@ -4,7 +4,7 @@ Lightstreamer - Load Test Toolkit
 
 ## Overview
 
-For a general overview of the Load Test Toolkit and its complete functionality, please refer to the [main branch README](../../tree/main#readme).
+For a general overview of the Load Test Toolkit and its complete functionality, please refer to the [main branch README](https://github.com/Lightstreamer/load-test-toolkit/).
 
 #### This branch contains a modified version of the *ClientSimulator* that can operate without the corresponding adapter-side component of LLTT.
 The client configuration has been extended to allow specifying a custom Adapter Set and Data Adapter to connect to, as well as defining parameters for session subscription settings.
@@ -110,7 +110,7 @@ The client can measure end-to-end latency by comparing a timestamp embedded in e
 
 * **`tsField4Latency`** - Name of the field in the server update that carries the timestamp
   - Default: `timestamp`
-  - The field must be included in `listOfFields` (or sent automatically by the adapter)
+  - The field must be included in `firstList` (and also in `secondList` if `enableItemListSwitching` is `true`) and the adapter must send it with the application-level origin timestamp of the data (or at least the time at which the update was sent from the adapter to Lightstreamer)
   - The client looks for this field in every received update and uses its value to compute the latency
 
 * **`tsDateFormat`** - Pattern used to parse the timestamp field when it contains a human-readable date/time string
@@ -137,7 +137,7 @@ When **both** parameters are set, the latency is computed as:
 
 $$\text{delay} = \text{currentTimeMillis()} - \left(\text{seconds} \times 1000 + \left\lfloor \frac{\text{nanos}}{1\,000\,000} \right\rfloor\right)$$
 
-When these parameters are set, `tsField4Latency` and `tsDateFormat` are ignored. Both fields must be included in `listOfFields`.
+When these parameters are set, `tsField4Latency` and `tsDateFormat` are ignored. Both fields must be included in `firstList` (and also in `secondList` if `enableItemListSwitching` is `true`).
 
 #### Configuration Examples
 
