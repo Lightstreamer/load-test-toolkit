@@ -1,7 +1,7 @@
 #!/bin/sh
 
-export JAVA_HOME=/usr/jdk1.8.0
-export CLASSPATH="$CLASSPATH:$(echo lib/*.jar | tr ' ' ':')"
+export JAVA_HOME=/usr/jdk-17
+export CLASSPATH="$CLASSPATH:lib/*"
 export CONFIG="log_conf.xml configuration.xml"
 export JVM_PROPERTIES="-server -Xms384m -Xmx512m"
 
@@ -30,4 +30,4 @@ if [ -n "${fs_file}" ]; then
 fi
 echo
 
-$JAVA_HOME/bin/java $JVM_PROPERTIES -cp $CLASSPATH com.lightstreamer.load_test.client.Client $CONFIG
+$JAVA_HOME/bin/java $JVM_PROPERTIES -cp "$CLASSPATH" com.lightstreamer.load_test.client.Client $CONFIG
