@@ -266,7 +266,7 @@ public class ConnectionManager {
                         pipeline.remove("reader"); // remove http handler
                     }
                     pipeline.addLast(new HttpObjectAggregator(8192));
-                    pipeline.addLast(WebSocketClientCompressionHandler.INSTANCE);
+                    pipeline.addLast(new WebSocketClientCompressionHandler(0));
                     pipeline.addLast("reader", new BindWsHandler(handshaker, handshakerPromise, session, ch1, chPool));
                     
                     handshakerPromise.addListener(new ChannelFutureListener() {
