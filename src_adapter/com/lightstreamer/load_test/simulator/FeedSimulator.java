@@ -22,7 +22,8 @@ import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.commons.Constants;
 import com.lightstreamer.load_test.commons.TimeConversion;
@@ -33,7 +34,7 @@ import com.lightstreamer.load_test.commons.TimeConversion;
  */
 public class FeedSimulator {
     
-    private static Logger _log = Logger.getLogger(FeedSimulator.class);
+    private static Logger _log = LogManager.getLogger(FeedSimulator.class);
     
     
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = null;

@@ -15,12 +15,11 @@
 
 package com.lightstreamer.load_test.standalone_simulator;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.simulator.FeedListener;
 import com.lightstreamer.load_test.simulator.FeedSimulator;
@@ -31,19 +30,17 @@ public class FeedSimulatorTest {
     private static FeedSimulatorConfiguration conf;
     
     private static final String defaultConfigFile = "adapters.xml";
-    private static final String defaultLogConfigFile = "adapter_log_conf.xml";
     
     private static Logger _log;
   
     /**
-     * by default uses adapters.xml as configuration file and adapter_log_conf.xml as log4j configuration
+     * by default uses adapters.xml as configuration file.
+     * Log4j2 configuration is set via the system property -Dlog4j.configurationFile on the command line.
      * you can specify a different configuration file adding "-conf filePath" as program argument (where filePath is the path of your file).
-     * you can specify a different log4j configuration file adding "-log filePath" as program argument  (where filePath is the path of your file).
      * @param args
      */
     public static void main(String[] args) {
         String configurationFileName = defaultConfigFile;
-        String logConfigurationFileName = defaultLogConfigFile;
         FeedListener listener = new VoidListener();
         
         //read parameters
@@ -58,24 +55,12 @@ public class FeedSimulatorTest {
                 } else {
                     exit("Specify a configuration file or remove the -conf parameter");
                 }
-                
-            } else if(args[i].equals("-log")) {
-                i++;
-                if (i < args.length) {
-                    logConfigurationFileName = args[i];
-                } else {
-                    exit("Specify a log configuration file or remove the -log parameter");
-                }
             }
             
         }
         
         
-        //Configure log
-        File logConfigurationFile = new File(logConfigurationFileName);
-        String logConfigFilePathStr = logConfigurationFile.getAbsolutePath();
-        DOMConfigurator.configureAndWatch(logConfigFilePathStr);
-        _log = Logger.getLogger(FeedSimulatorTest.class);
+        _log = LogManager.getLogger(FeedSimulatorTest.class);
         
         if (_log.isTraceEnabled()) {
             listener = new LogListener();
@@ -103,10 +88,10 @@ public class FeedSimulatorTest {
        }
      
     private static void help() {
-        System.out.println("By default uses "+defaultConfigFile+" as configuration file and "+defaultLogConfigFile+" as log4j configuration.");
+        System.out.println("By default uses "+defaultConfigFile+" as configuration file.");
+        System.out.println("Log4j2 configuration is set via -Dlog4j.configurationFile on the command line.");
 
         System.out.println("\t-conf <file_path>\tSpecify a different configuration file");
-        System.out.println("\t-log <file_path>\tSpecify a different log4j configuration file");
         System.out.println("\t-help\tShow this help and exit");
         
         System.exit(0);

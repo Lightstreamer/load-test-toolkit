@@ -24,7 +24,7 @@ public class Logger {
      */
     static final boolean printStackTrace = Boolean.getBoolean("lightstreamer.client.print.stack.trace");
     
-    static final org.apache.log4j.Logger log = org.apache.log4j.Logger.getLogger("com.lightstreamer.oneway_client");
+    static final org.apache.logging.log4j.Logger log = org.apache.logging.log4j.LogManager.getLogger("com.lightstreamer.oneway_client");
     
     public static boolean isDebug() {
         return log.isDebugEnabled();

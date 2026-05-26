@@ -17,7 +17,8 @@ package com.lightstreamer.load_test.client;
 
 import java.util.HashMap;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.client.utils.BaseClientListener;
 import com.lightstreamer.load_test.client.utils.BaseSubscriptionListener;
@@ -33,7 +34,7 @@ public class FirstClient {
     private String[] schema;
 
     HashMap<String,String> readConf = new HashMap<String,String>();
-    Logger _log = Logger.getLogger(Constants.CONFIGURATION_LOGGER);
+    Logger _log = LogManager.getLogger(Constants.CONFIGURATION_LOGGER);
     
     public FirstClient() {
     }

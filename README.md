@@ -351,8 +351,10 @@ Simulator) and **configuration.xml** (for Client Simulator) to know the
 meaning of the available parameters._
 
 Both the Client Simulator and the Adapter Simulator contain their own
-log4j configuration file, which can be edited: log\_conf.xml for the
-Client; **adapter\_log\_conf.xml** for the Adapter.
+log4j2 configuration file, which can be edited: **log\_conf.xml** for the
+Client; **adapter\_log\_conf.xml** for the Adapter. The log configuration
+file is set via the `-Dlog4j.configurationFile` system property in the
+launcher scripts.
 
 In case you need to simulate **very low frequency scenarios**, where no
 updates should be sent to a session for several seconds or even minutes,
@@ -440,9 +442,9 @@ To turn on latency reporting on a Client Simulator instance, you need to
   - Set \<param name="**injectTimestamps**"\> to **true** in the
     **adapters.xml** file of the Adapter Simulator within
     Lightstreamer Server installation.
-  - Set priority value to **INFO** for the
+  - Set the level to **INFO** for the
     "**com.lightstreamer.load\_test.reports.latency\_reporting**"
-    category in the **log\_conf.xml** file of the Client Simulator,
+    logger in the **log\_conf.xml** file of the Client Simulator,
     before launching the
 client.
 

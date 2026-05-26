@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.interfaces.data.DataProviderException;
 import com.lightstreamer.interfaces.data.FailureException;
@@ -63,8 +63,9 @@ public class AdapterSimulator implements SmartDataProvider {
     public void init(Map paramsMap, File configDir) throws DataProviderException {
         File logConfigurationFile = new File(configDir.getAbsolutePath()+"/adapter_log_conf.xml");
         String logConfigFilePathStr = logConfigurationFile.getAbsolutePath();
-        DOMConfigurator.configureAndWatch(logConfigFilePathStr);
-        _log = Logger.getLogger(AdapterSimulator.class);
+        System.setProperty("log4j.configurationFile", logConfigFilePathStr);
+        org.apache.logging.log4j.core.config.Configurator.reconfigure();
+        _log = LogManager.getLogger(AdapterSimulator.class);
         
         
         final FeedSimulatorConfiguration simulatorConf;

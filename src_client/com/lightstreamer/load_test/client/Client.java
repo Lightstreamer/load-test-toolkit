@@ -19,8 +19,8 @@ package com.lightstreamer.load_test.client;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
-import org.apache.log4j.xml.DOMConfigurator;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.w3c.dom.Document;
 
 import com.lightstreamer.load_test.commons.ClientConfiguration;
@@ -29,7 +29,7 @@ import com.lightstreamer.load_test.commons.XmlUtils;
 import com.lightstreamer.oneway_client.netty.Factory;
 
 import io.netty.util.internal.logging.InternalLoggerFactory;
-import io.netty.util.internal.logging.Log4JLoggerFactory;
+import io.netty.util.internal.logging.Log4J2LoggerFactory;
 
 
 
@@ -62,27 +62,25 @@ public class Client {
     }
     
     private static void doMain(String[] args) {
-        if (args.length < 2) {
-            exit("Usage: [<log-config-file> <client-config-file> <client-config-file2> ...]\n\rDifferent client-config-file will be concatenated",1,null);
+        if (args.length < 1) {
+            exit("Usage: [<client-config-file> <client-config-file2> ...]\n\rDifferent client-config-file will be concatenated",1,null);
         }
         
         try {
-            /* Configure log4j */
-            DOMConfigurator.configureAndWatch(args[0]);
-            /* Configure Netty logger to use log4j */
-            InternalLoggerFactory.setDefaultFactory(Log4JLoggerFactory.INSTANCE);
+            /* Configure Netty logger to use log4j2 */
+            InternalLoggerFactory.setDefaultFactory(Log4J2LoggerFactory.INSTANCE);
             
         } catch (Exception e) {
             exit(e.getMessage(),2,e);
         }
         
-        _logConf = Logger.getLogger(Constants.CONFIGURATION_LOGGER);
+        _logConf = LogManager.getLogger(Constants.CONFIGURATION_LOGGER);
         
         _logConf.info("Reading local configuration...");
         Map<String,String> params = new HashMap<String,String>();
-        for (int i=1; i<args.length; i++) {
+        for (int i=0; i<args.length; i++) {
             try {
-                Document doc = XmlUtils.newDocumentBuilder(args[1]);
+                Document doc = XmlUtils.newDocumentBuilder(args[0]);
                 params.putAll(XmlUtils.getNodeValue4Attribute(doc, "param", "name"));
             } catch(Exception e) {
                 exit("Can't read configuration file " + args[i],3,e);

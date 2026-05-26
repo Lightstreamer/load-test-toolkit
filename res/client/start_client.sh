@@ -2,8 +2,8 @@
 
 export JAVA_HOME=/usr/jdk-17
 export CLASSPATH="$CLASSPATH:lib/*"
-export CONFIG="log_conf.xml configuration.xml"
-export JVM_PROPERTIES="-server -Xms384m -Xmx512m"
+export CONFIG="configuration.xml"
+export JVM_PROPERTIES="-server -Xms384m -Xmx512m -Dlog4j.configurationFile=log_conf.xml"
 
 # In order to open many concurrent user connections,
 # the limits on the available file descriptors should be released;
