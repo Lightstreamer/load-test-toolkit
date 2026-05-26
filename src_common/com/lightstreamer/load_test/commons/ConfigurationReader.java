@@ -17,11 +17,12 @@ package com.lightstreamer.load_test.commons;
 
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ConfigurationReader {
     
-    protected static Logger _log = Logger.getLogger(Constants.CONFIGURATION_LOGGER);
+    protected static Logger _log = LogManager.getLogger(Constants.CONFIGURATION_LOGGER);
     
     public static final short INT = 1;
     public static final short STRING = 2;

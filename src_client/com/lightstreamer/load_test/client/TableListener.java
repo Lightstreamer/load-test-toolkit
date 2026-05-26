@@ -23,7 +23,8 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Map.Entry;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.client.utils.BaseSubscriptionListener;
 import com.lightstreamer.load_test.commons.ClientConfiguration;
@@ -46,11 +47,11 @@ class TableListener extends BaseSubscriptionListener {
     private final boolean speedUpReading;
     
     private static final String LATENCY_ERROR = "Latency report is active but the server is not sending timestamps. Please correct the client log configuration or the adapters.xml configuration file on the server";
-    private static Logger _logUpdates = Logger.getLogger(Constants.UPDATES_LOGGER);
-    private static Logger _logLatencies = Logger.getLogger(Constants.LATENCY_LOGGER);
+    private static Logger _logUpdates = LogManager.getLogger(Constants.UPDATES_LOGGER);
+    private static Logger _logLatencies = LogManager.getLogger(Constants.LATENCY_LOGGER);
     
     //for this logger to work the statsManager must be != null (i.e. latency_statistics must be at least at INFO level) 
-    private static Logger _logUpdates2 = Logger.getLogger(Constants.TIMESTAMPS_LOGGER);
+    private static Logger _logUpdates2 = LogManager.getLogger(Constants.TIMESTAMPS_LOGGER);
     private static StringBuffer timestampsString;
     private static long lastLog;
     

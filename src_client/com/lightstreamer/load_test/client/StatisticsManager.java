@@ -21,7 +21,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.commons.Constants;
 import com.lightstreamer.load_test.commons.TimeConversion;
@@ -29,7 +30,7 @@ import com.lightstreamer.load_test.commons.TimeConversion;
 
 public class StatisticsManager {
 
-    private Logger latencyLogger = Logger.getLogger(Constants.LATENCY_LOGGER);
+    private Logger latencyLogger = LogManager.getLogger(Constants.LATENCY_LOGGER);
     private ScheduledThreadPoolExecutor scheduledThreadPoolExecutor = new ScheduledThreadPoolExecutor(1,new ThreadFactory() {
         public Thread newThread(Runnable r) {
             Thread t = new Thread(r, "Latency report thread");

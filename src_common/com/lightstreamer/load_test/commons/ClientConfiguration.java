@@ -18,7 +18,8 @@ package com.lightstreamer.load_test.commons;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class ClientConfiguration extends ConfigurationReader implements Cloneable {
     
@@ -169,8 +170,8 @@ public class ClientConfiguration extends ConfigurationReader implements Cloneabl
     }
     
     public void generateDataNeededValue() {
-        Logger updatesLogger = Logger.getLogger(Constants.UPDATES_LOGGER);
-        Logger latencyLogger = Logger.getLogger(Constants.LATENCY_LOGGER);
+        Logger updatesLogger = LogManager.getLogger(Constants.UPDATES_LOGGER);
+        Logger latencyLogger = LogManager.getLogger(Constants.LATENCY_LOGGER);
         this.dataNeededForLog = updatesLogger.isDebugEnabled() || latencyLogger.isInfoEnabled();
         _log.info("updatesLogger.isDebugEnabled(): " + updatesLogger.isDebugEnabled());
         _log.info("latencyLogger.isInfoEnabled(): " + latencyLogger.isInfoEnabled());

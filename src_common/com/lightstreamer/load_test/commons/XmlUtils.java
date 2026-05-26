@@ -119,7 +119,7 @@ public class XmlUtils {
         if (strParameter == null) {
             return null;
         }
-        Integer intParameter = new Integer(strParameter);
+        Integer intParameter = Integer.valueOf(strParameter);
         if (intParameter <= 0) {
             throw new Exception(name + " must be grater than zero");
         }
@@ -136,7 +136,7 @@ public class XmlUtils {
         if (strParameter == null) {
             return null;
         }
-        Long longParameter = new Long(strParameter);
+        Long longParameter = Long.valueOf(strParameter);
         if (longParameter <= 0) {
             throw new Exception(name + " must be grater than zero");
         }
@@ -153,7 +153,7 @@ public class XmlUtils {
         if (strParameter == null) {
             return null;
         }
-        Double doubleParameter = new Double(strParameter);
+        Double doubleParameter = Double.valueOf(strParameter);
         if (doubleParameter <= 0) {
             throw new Exception(name + " must be grater than zero");
         }

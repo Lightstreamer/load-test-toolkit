@@ -23,7 +23,8 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.client.utils.BaseClientListener;
 import com.lightstreamer.load_test.client.utils.Utils;
@@ -40,7 +41,7 @@ import com.lightstreamer.oneway_client.Subscription;
  */
 public class SessionsHandler {
 
-    Logger _logUpdates = Logger.getLogger(Constants.UPDATES_LOGGER);
+    Logger _logUpdates = LogManager.getLogger(Constants.UPDATES_LOGGER);
      
     ClientConfiguration conf;
     private StatisticsManager statsManager = null; 
@@ -80,7 +81,7 @@ public class SessionsHandler {
     public SessionsHandler(ClientConfiguration conf) {
       this.conf = conf;
 
-      if (Logger.getLogger(Constants.LATENCY_LOGGER).isInfoEnabled()) { 
+      if (LogManager.getLogger(Constants.LATENCY_LOGGER).isInfoEnabled()) { 
           this.statsManager = new StatisticsManager();
       }
       

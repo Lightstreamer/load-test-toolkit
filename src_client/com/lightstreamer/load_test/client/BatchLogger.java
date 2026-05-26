@@ -19,7 +19,8 @@ import java.util.concurrent.ScheduledThreadPoolExecutor;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.log4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import com.lightstreamer.load_test.commons.ClientConfiguration;
 import com.lightstreamer.load_test.commons.Constants;
@@ -36,7 +37,7 @@ public class BatchLogger {
         }
     });
     
-    private Logger _logUpdates = Logger.getLogger(Constants.UPDATES_LOGGER);
+    private Logger _logUpdates = LogManager.getLogger(Constants.UPDATES_LOGGER);
     
     private int newSessions = 0;
     private int newTerminatedSessions = 0;
